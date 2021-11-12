@@ -405,7 +405,6 @@ class CalibrationMethodTest {
 	
 	@Test
 	void testAdjustAddOffsets() {
-		System.out.println("got here 1");		
 		Double[] testAddOffset = {0.0, 0.0}; 
 		Double[] testAddOffset1 = {0.0, 0.0};
 		Double[] testMultOffset = {0.1, 0.1};
@@ -413,43 +412,105 @@ class CalibrationMethodTest {
 		Double[][] testRawData = {{10.0, 10.0}};
 		Double testAddStep = 0.01;
 		Double[][] testSpecToXYZ = {{1.0}, {1.0}, {1.0}};
-		System.out.println("got here 2");		
-
 		Double[] testCalLStar = calMeth.calculateLStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
 		Double[] testCalAStar = calMeth.calculateAStar(calMeth.calculateVarX(calMeth.calculateX(testRawData, testSpecToXYZ[1])), calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
 		Double[] testCalBStar = calMeth.calculateBStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[2])), calMeth.calculateVarZ(calMeth.calculateZ(testRawData, testSpecToXYZ[0])));
-		System.out.println("got here 3");		
-
 		Double[] testRealLStar = {1.0, 1.0};
 		Double[] testRealAStar = {1.0, 1.0};
 		Double[] testRealBStar = {1.0, 1.0};
 		Double[] testDeltaE = calMeth.calculateDeltaE(testCalLStar, testCalAStar, testCalBStar, testRealLStar, testRealAStar, testRealBStar);
-		System.out.println("got here 4");		
-
 		Double testAvgDeltaE = calMeth.averageDeltaE(testDeltaE);
-		System.out.println("got here 5");		
 
-		
 		calMeth.setAddOffset(calMeth.adjustAddOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, testAddStep, testSpecToXYZ, testRealLStar, testRealAStar, testRealBStar));
-		System.out.println("got here 6");		
-		System.out.print("Add Offset: ");
-		System.out.println(calMeth.getAddOffset()[0]);
-		System.out.print("Test Add Offset: ");
-		System.out.println(testAddOffset1[0]);
-		
 		assertArrayEquals(calMeth.convertDTod1D(calMeth.getAddOffset()), calMeth.convertDTod1D(testAddOffset1), 0.01);
-		System.out.println("got here 7");		
-
+		
+		Double[] testRealLStar1 = {-1.0, -1.0};
+		Double[] testRealAStar1 = {-1.0, -1.0};
+		Double[] testRealBStar1 = {-1.0, -1.0};
+		
+		calMeth.setAddOffset(calMeth.adjustAddOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, (-testAddStep), testSpecToXYZ, testRealLStar1, testRealAStar1, testRealBStar1));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getAddOffset()), calMeth.convertDTod1D(testAddOffset1), 0.01);
 	}
 
 	@Test
 	void testAdjustMultOffsets() {
+		Double[] testAddOffset = {0.0, 0.0}; 
+		Double[] testMultOffset = {0.1, 0.1};
+		Double[] testMultOffset1 = {0.1, 0.1};
+		Double[] testExpOffset = {1.0, 1.0};
+		Double[][] testRawData = {{10.0, 10.0}};
+		Double testMultStep = 0.0001;
+		Double[][] testSpecToXYZ = {{1.0}, {1.0}, {1.0}};
+		Double[] testCalLStar = calMeth.calculateLStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
+		Double[] testCalAStar = calMeth.calculateAStar(calMeth.calculateVarX(calMeth.calculateX(testRawData, testSpecToXYZ[1])), calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
+		Double[] testCalBStar = calMeth.calculateBStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[2])), calMeth.calculateVarZ(calMeth.calculateZ(testRawData, testSpecToXYZ[0])));
+		Double[] testRealLStar = {10.0, 10.0};
+		Double[] testRealAStar = {10.0, 10.0};
+		Double[] testRealBStar = {10.0, 10.0};
+		Double[] testDeltaE = calMeth.calculateDeltaE(testCalLStar, testCalAStar, testCalBStar, testRealLStar, testRealAStar, testRealBStar);
+		Double testAvgDeltaE = calMeth.averageDeltaE(testDeltaE);
+
+		calMeth.setMultOffset(calMeth.adjustMultOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, testMultStep, testSpecToXYZ, testRealLStar, testRealAStar, testRealBStar));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getMultOffset()), calMeth.convertDTod1D(testMultOffset1), 0.01);
 		
+		testMultOffset[0] = 10.0;
+		testMultOffset[1] = 10.0;
+		testMultOffset1[0] = 10.0;
+		testMultOffset1[1] = 10.0;
+		testAvgDeltaE = 400.0;
+		Double[] testRealLStar1 = {-0.01, -0.01};
+		Double[] testRealAStar1 = {-0.01, -0.01};
+		Double[] testRealBStar1 = {-0.01, -0.01};
+		
+		calMeth.setMultOffset(calMeth.adjustMultOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, (-testMultStep), testSpecToXYZ, testRealLStar1, testRealAStar1, testRealBStar1));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getMultOffset()), calMeth.convertDTod1D(testMultOffset1), 0.01);
 	}
 	
 	@Test
 	void testAdjustExpOffsets() {
+		Double[] testAddOffset = {0.0, 0.0}; 
+		Double[] testMultOffset = {1.0, 1.0};
+		Double[] testExpOffset = {0.1, 0.1};
+		Double[] testExpOffset1 = {0.1, 0.1};
+		Double[][] testRawData = {{10.0, 10.0}};
+		Double testExpStep = 0.01;
+		Double[][] testSpecToXYZ = {{1.0}, {1.0}, {1.0}};
+		Double[] testCalLStar = calMeth.calculateLStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
+		Double[] testCalAStar = calMeth.calculateAStar(calMeth.calculateVarX(calMeth.calculateX(testRawData, testSpecToXYZ[1])), calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[0])));
+		Double[] testCalBStar = calMeth.calculateBStar(calMeth.calculateVarY(calMeth.calculateY(testRawData, testSpecToXYZ[2])), calMeth.calculateVarZ(calMeth.calculateZ(testRawData, testSpecToXYZ[0])));
+		Double[] testRealLStar = {1.0, 1.0};
+		Double[] testRealAStar = {1.0, 1.0};
+		Double[] testRealBStar = {1.0, 1.0};
+		Double[] testDeltaE = calMeth.calculateDeltaE(testCalLStar, testCalAStar, testCalBStar, testRealLStar, testRealAStar, testRealBStar);
+		Double testAvgDeltaE = calMeth.averageDeltaE(testDeltaE);
+
+		calMeth.setExpOffset(calMeth.adjustExpOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, testExpStep, testSpecToXYZ, testRealLStar, testRealAStar, testRealBStar));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getExpOffset()), calMeth.convertDTod1D(testExpOffset1), 0.01);
 		
+		testExpOffset[0] = 1.0;
+		testExpOffset[1] = 1.0;
+		testExpOffset1[0] = 1.0;
+		testExpOffset1[1] = 0.99;
+		testAvgDeltaE = 150.0;
+		Double[] testRealLStar1 = {0.01, 0.01};
+		Double[] testRealAStar1 = {0.01, 0.01};
+		Double[] testRealBStar1 = {0.01, 0.01};
+		
+		calMeth.setExpOffset(calMeth.adjustExpOffsets(testAddOffset, testMultOffset, testExpOffset, testAvgDeltaE, testRawData, (-testExpStep), testSpecToXYZ, testRealLStar1, testRealAStar1, testRealBStar1));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getExpOffset()), calMeth.convertDTod1D(testExpOffset1), 0.01);
 	}
 	
+	@Test
+	void testConvertMethods() {
+		Double[][] twoD = {{1.0, 2.0}, {3.0, 4.0}};
+		Double[] oneD = {1.0, 2.0};
+		double[][] expectedTwoD = {{1.0, 2.0}, {3.0, 4.0}};
+		double[] expectedOneD = {1.0, 2.0};
+		
+		for(int i = 0; i < twoD.length; i++) {
+			assertArrayEquals(calMeth.convertDTod2D(twoD)[i], expectedTwoD[i], 0.01);
+		}
+		
+		assertArrayEquals(calMeth.convertDTod1D(oneD), expectedOneD, 0.01);
+	}
 }

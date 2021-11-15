@@ -487,8 +487,8 @@ public class CalibrationMethod {
 		for(int i = 0; i < rawData.length; i++) {
 			for(int j = 0; j < rawData[i].length; j++) {
 				if((rawData[i][j] + addOffset[j]) * multOffset[j] > 0) {
-					offsetData[i][j] = Math.pow(((rawData[i][j] + addOffset[i]) * 
-							multOffset[i]), expOffset[i]);
+					offsetData[i][j] = Math.pow(((rawData[i][j] + addOffset[j]) * 
+							multOffset[j]), expOffset[j]);
 				}
 				else {
 					offsetData[i][j] = 0.0;

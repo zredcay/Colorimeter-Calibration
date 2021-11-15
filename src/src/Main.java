@@ -41,7 +41,6 @@ public class Main {
 			realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 			y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
 	public static void main(String[] args) throws FileNotFoundException {
-		Main m = new Main();
 		Double[][] rawData = new Double[1][1];
 		Double[][] altData = new Double[1][1];
 		Double[] addOffset = new Double[1];
@@ -77,6 +76,11 @@ public class Main {
 				multOffset, expOffset, deltaE, avgDeltaE, calR, calG, calB, realR, realG, 
 				realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 				y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
+		Main m = new Main(rawData, altData, addOffset, multOffset,
+				expOffset, deltaE, avgDeltaE, calR, calG, calR, realR, realG, realB,
+				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
+				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
+				addStep, multStep, expStep, cal);
 		
 		System.out.println("CALIBRATION PROCESS BEGIN");
 		
@@ -120,6 +124,243 @@ public class Main {
 		System.out.println("CALIBRATION PROCESS END");
 	}
 	
+	public Main(Double[][] rawData, Double[][] altData, Double[] addOffset, Double[] multOffset, Double[] expOffset,
+			Double[] deltaE, Double avgDeltaE, Double[] calR, Double[] calG, Double[] calB, Double[] realR,
+			Double[] realG, Double[] realB, Double[] calLStar, Double[] calAStar, Double[] calBStar, Double[] realLStar,
+			Double[] realAStar, Double[] realBStar, Double[] x, Double[] y, Double[] z, Double[] varX, Double[] varY,
+			Double[] varZ, Double[][] xyzToRGB, Double[][] specToXYZ, int numRuns, Double addStep, Double multStep,
+			Double expStep, CalibrationMethod cal) {
+		super();
+		this.rawData = rawData;
+		this.altData = altData;
+		this.addOffset = addOffset;
+		this.multOffset = multOffset;
+		this.expOffset = expOffset;
+		this.deltaE = deltaE;
+		this.avgDeltaE = avgDeltaE;
+		this.calR = calR;
+		this.calG = calG;
+		this.calB = calB;
+		this.realR = realR;
+		this.realG = realG;
+		this.realB = realB;
+		this.calLStar = calLStar;
+		this.calAStar = calAStar;
+		this.calBStar = calBStar;
+		this.realLStar = realLStar;
+		this.realAStar = realAStar;
+		this.realBStar = realBStar;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.varX = varX;
+		this.varY = varY;
+		this.varZ = varZ;
+		this.xyzToRGB = xyzToRGB;
+		this.specToXYZ = specToXYZ;
+		this.numRuns = numRuns;
+		this.addStep = addStep;
+		this.multStep = multStep;
+		this.expStep = expStep;
+		this.cal = cal;
+	}
+
+	//Getters
+	public Double[][] getRawData() {
+		return rawData;
+	}
+	public Double[][] getAltData() {
+		return altData;
+	}
+	public Double[] getAddOffset() {
+		return addOffset;
+	}
+	public Double[] getMultOffset() {
+		return multOffset;
+	}
+	public Double[] getExpOffset() {
+		return expOffset;
+	}
+	public Double[] getDeltaE() {
+		return deltaE;
+	}
+	public Double getAvgDeltaE() {
+		return avgDeltaE;
+	}
+	public Double[] getCalR() {
+		return calR;
+	}
+	public Double[] getCalG() {
+		return calG;
+	}
+	public Double[] getCalB() {
+		return calB;
+	}
+	public Double[] getRealR() {
+		return realR;
+	}
+	public Double[] getRealG() {
+		return realG;
+	}
+	public Double[] getRealB() {
+		return realB;
+	}
+	public Double[] getCalLStar() {
+		return calLStar;
+	}
+	public Double[] getCalAStar() {
+		return calAStar;
+	}
+	public Double[] getCalBStar() {
+		return calBStar;
+	}
+	public Double[] getRealLStar() {
+		return realLStar;
+	}
+	public Double[] getRealAStar() {
+		return realAStar;
+	}
+	public Double[] getRealBStar() {
+		return realBStar;
+	}
+	public Double[] getX() {
+		return x;
+	}
+	public Double[] getY() {
+		return y;
+	}
+	public Double[] getZ() {
+		return z;
+	}
+	public Double[] getVarX() {
+		return varX;
+	}
+	public Double[] getVarY() {
+		return varY;
+	}
+	public Double[] getVarZ() {
+		return varZ;
+	}
+	public Double[][] getXYZToRGB() {
+		return xyzToRGB;
+	}
+	public Double[][] getSpecToXYZ() {
+		return specToXYZ;
+	}
+	public int getNumRuns() {
+		return numRuns;
+	}
+	public Double getAddStep() {
+		return addStep;
+	}
+	public Double getMultStep() {
+		return multStep;
+	}
+	public Double getExpStep() {
+		return expStep;
+	}
+	public CalibrationMethod getCal() {
+		return cal;
+	}
+	
+	//Setters
+	public void setRawData(Double[][] rawData) {
+		this.rawData = rawData;
+	}
+	public void setAltData(Double[][] altData) {
+		this.altData = altData;
+	}
+	public void setAddOffset(Double[] addOffset) {
+		this.addOffset = addOffset;
+	}
+	public void setMultOffset(Double[] multOffset) {
+		this.multOffset = multOffset;
+	}
+	public void setExpOffset(Double[] expOffset) {
+		this.expOffset = expOffset;
+	}
+	public void setDeltaE(Double[] deltaE) {
+		this.deltaE = deltaE;
+	}
+	public void setAvgDeltaE(Double avgDeltaE) {
+		this.avgDeltaE = avgDeltaE;
+	}
+	public void setCalR(Double[] calR) {
+		this.calR = calR;
+	}
+	public void setCalG(Double[] calG) {
+		this.calG = calG;
+	}
+	public void setCalB(Double[] calB) {
+		this.calB = calB;
+	}
+	public void setRealR(Double[] realR) {
+		this.realR = realR;
+	}
+	public void setRealG(Double[] realG) {
+		this.realG = realG;
+	}
+	public void setRealB(Double[] realB) {
+		this.realB = realB;
+	}
+	public void setCalLStar(Double[] calLStar) {
+		this.calLStar = calLStar;
+	}
+	public void setCalAStar(Double[] calAStar) {
+		this.calAStar = calAStar;
+	}
+	public void setCalBStar(Double[] calBStar) {
+		this.calBStar = calBStar;
+	}
+	public void setRealLStar(Double[] realLStar) {
+		this.realLStar = realLStar;
+	}
+	public void setRealAStar(Double[] realAStar) {
+		this.realAStar = realAStar;
+	}
+	public void setRealBStar(Double[] realBStar) {
+		this.realBStar = realBStar;
+	}
+	public void setX(Double[] x) {
+		this.x = x;
+	}
+	public void setY(Double[] y) {
+		this.y = y;
+	}
+	public void setZ(Double[] z) {
+		this.z = z;
+	}
+	public void setVarX(Double[] varX) {
+		this.varX = varX;
+	}
+	public void setVarY(Double[] varY) {
+		this.varY = varY;
+	}
+	public void setVarZ(Double[] varZ) {
+		this.varZ = varZ;
+	}
+	public void setXYZToRGB(Double[][] xyzToRGB) {
+		this.xyzToRGB = xyzToRGB;
+	}
+	public void setSpecToXYZ(Double[][] specToXYZ) {
+		this.specToXYZ = specToXYZ;
+	}
+	public void setNumRuns(int numRuns) {
+		this.numRuns = numRuns;
+	}
+	public void setAddStep(Double addStep) {
+		this.addStep = addStep;
+	}
+	public void setMultStep(Double multStep) {
+		this.multStep = multStep;
+	}
+	public void setExpStep(Double expStep) {
+		this.expStep = expStep;
+	}
+	public void setCal(CalibrationMethod cal) {
+		this.cal = cal;
+	}
+
 	public Double[][] readCSV(File CSV, int height, int width) throws FileNotFoundException{
 		Double[][] data = new Double[height][width];
 		ArrayList<ArrayList<String>> dataList = new ArrayList<>();
@@ -170,6 +411,11 @@ public class Main {
 		sc.nextLine();
 		
 		int width = 14;
+		
+		if(height == 2) {
+			width = 2;
+		}
+		
 		File rawData = new File(filePath);
 		cal.setRawData(readCSV(rawData, height, width));
 				
@@ -202,7 +448,7 @@ public class Main {
 		System.out.println("Enter real B data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realB = new File(filePath);
-		cal.setRealLStar(convertTo1D(readCSV(realB, 1, height)));
+		cal.setRealB(convertTo1D(readCSV(realB, 1, height)));
 		
 		System.out.println("Enter number of runs: ");
 		cal.setNumRuns(sc.nextInt());

@@ -1,6 +1,7 @@
 package src;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -91,9 +92,9 @@ public class Main {
 			
 			cal.setAltData(cal.applyOffsets(cal.getRawData(), cal.getAddOffset(), cal.getMultOffset(), cal.getExpOffset()));
 			
-			cal.setVarX(cal.calculateX(cal.getAltData(), cal.getSpecToXYZ()[0]));
-			cal.setVarY(cal.calculateY(cal.getAltData(), cal.getSpecToXYZ()[1]));
-			cal.setVarZ(cal.calculateZ(cal.getAltData(), cal.getSpecToXYZ()[2]));
+			cal.setX(cal.calculateX(cal.getAltData(), cal.getSpecToXYZ()[0]));
+			cal.setY(cal.calculateY(cal.getAltData(), cal.getSpecToXYZ()[1]));
+			cal.setZ(cal.calculateZ(cal.getAltData(), cal.getSpecToXYZ()[2]));
 			
 			cal.setVarX(cal.calculateVarX(cal.getX()));
 			cal.setVarY(cal.calculateVarY(cal.getY()));
@@ -119,35 +120,43 @@ public class Main {
 		System.out.println("CALIBRATION PROCESS END");
 	}
 	
-	
-	public Double[][] readCSV2D(File CSV, int height, int width) throws FileNotFoundException{
+	public Double[][] readCSV(File CSV, int height, int width) throws FileNotFoundException{
 		Double[][] data = new Double[height][width];
-		Scanner sc = new Scanner(CSV);  
-		sc.useDelimiter(",");  
-		for(int i = 0; i < data.length - 1; i++) {
-			int j = 0;
-			while(sc.hasNext()) {
-				double a = sc.nextDouble();
-				Double b = (Double) a;
-				System.out.println(b.getClass().getSimpleName());
-				System.out.println(b);
-				//data[i][j] = (Double) sc.nextDouble();
-				j++;
-			}
+		ArrayList<ArrayList<String>> dataList = new ArrayList<>();
+		try (Scanner scanner = new Scanner(CSV);) {
+		    while (scanner.hasNextLine()) {
+		        dataList.add(getDataFromLine(scanner.nextLine()));
+		    }
 		}
-		sc.close(); 
+		
+		for (int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
+				data[i][j] = (Double) Double.parseDouble(dataList.get(i).get(j));
+				//System.out.print(data[i][j] + " ");
+			}
+			//System.out.println();
+		}
+		
 		return data;
 	}
 	
-	public Double[] readCSV1D(File CSV, int height) throws FileNotFoundException{
-		Double[] data = new Double[height];
-		Scanner sc = new Scanner(CSV);  
-		sc.useDelimiter(",");  
-		for(int i = 0; i < data.length; i++) {
-			data[i] = (Double) sc.nextDouble();
+	public ArrayList<String> getDataFromLine(String line) {
+	    ArrayList<String> data = new ArrayList<String>();
+	    try (Scanner rowScanner = new Scanner(line)) {
+	        rowScanner.useDelimiter(",");
+	        while (rowScanner.hasNext()) {
+	            data.add(rowScanner.next());
+	        }
+	    }
+	    return data;
+	}
+	
+	public Double[] convertTo1D(Double[][] data) {
+		Double[] values = new Double[data[0].length];
+		for(int i = 0; i < values.length; i++) {
+			values[i] = data[0][i];
 		}
-		sc.close(); 
-		return data;
+		return values;
 	}
 	
 	public CalibrationMethod readUserInput(CalibrationMethod cal) throws FileNotFoundException {
@@ -158,52 +167,58 @@ public class Main {
 		
 		System.out.println("Enter number of samples ");
 		int height = sc.nextInt();
+		sc.nextLine();
 		
 		int width = 14;
 		File rawData = new File(filePath);
-		cal.setRawData(readCSV2D(rawData, height, width));
-		
+		cal.setRawData(readCSV(rawData, height, width));
+				
 		System.out.println("Enter real CIEL data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
-		filePath = sc.nextLine();
-		File realLStar = new File(filePath);
-		cal.setRealLStar(readCSV1D(realLStar, height));
+		String filePath1 = sc.nextLine();
+		File realLStar = new File(filePath1);
+
+		cal.setRealLStar(convertTo1D(readCSV(realLStar, 1, height)));
 		
 		System.out.println("Enter real CIEA data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realAStar = new File(filePath);
-		cal.setRealAStar(readCSV1D(realAStar, height));
+		cal.setRealAStar(convertTo1D(readCSV(realAStar, 1, height)));
 		
 		System.out.println("Enter real CIEB data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realBStar = new File(filePath);
-		cal.setRealBStar(readCSV1D(realBStar, height));
+		cal.setRealBStar(convertTo1D(readCSV(realBStar, 1, height)));
 		
 		System.out.println("Enter real R data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realR = new File(filePath);
-		cal.setRealR(readCSV1D(realR, height));
+		cal.setRealR(convertTo1D(readCSV(realR, 1, height)));
 		
 		System.out.println("Enter real G data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realG = new File(filePath);
-		cal.setRealG(readCSV1D(realG, height));
+		cal.setRealG(convertTo1D(readCSV(realG, 1, height)));
 		
 		System.out.println("Enter real B data file path (Z:\\PMFI Grant\\CalDemo.csv): ");
 		filePath = sc.nextLine();
 		File realB = new File(filePath);
-		cal.setRealLStar(readCSV1D(realB, height));
+		cal.setRealLStar(convertTo1D(readCSV(realB, 1, height)));
 		
 		System.out.println("Enter number of runs: ");
 		cal.setNumRuns(sc.nextInt());
+		sc.nextLine();
 		
 		System.out.println("Enter addition step: ");
 		cal.setAddStep(sc.nextDouble());
+		sc.nextLine();
 
 		System.out.println("Enter multiplication step: ");
 		cal.setMultStep(sc.nextDouble());
+		sc.nextLine();
 
 		System.out.println("Enter exponent step: ");
 		cal.setExpStep(sc.nextDouble());
+		sc.nextLine();
 		
 		sc.close();
 		return cal;
@@ -219,11 +234,11 @@ public class Main {
 		cal.setMultOffset(multOff);
 		cal.setExpOffset(expOff);
 		
-		File xyzToRGB = new File("Z:\\PMFI Grant\\XYZToRGB.csv");
-		cal.setXYZToRGB(readCSV2D(xyzToRGB, 3, 3));
+		File xyzToRGB = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\XYZToRGB.csv");
+		cal.setXYZToRGB(readCSV(xyzToRGB, 3, 3));
 		
-		File specToXYZ = new File("Z:\\PMFI Grant\\SpectrumToXYZ.csv");
-		cal.setSpecToXYZ(readCSV2D(specToXYZ, 3, 14));
+		File specToXYZ = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\SpectrumToXYZ.csv");
+		cal.setSpecToXYZ(readCSV(specToXYZ, 3, 14));
 		
 		readUserInput(cal);
 		
@@ -278,7 +293,7 @@ public class Main {
 		
 		System.out.println("Delta E:");
 		int count = 0;
-		for(Double val : cal.getAddOffset()) {
+		for(Double val : cal.getDeltaE()) {
 			count++;
 			System.out.println("	Sample " + count + ": " + val);
 		}

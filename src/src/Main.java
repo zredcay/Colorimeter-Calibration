@@ -12,6 +12,7 @@ public class Main {
 	private Double[] expOffset;
 	private Double[] deltaE;
 	private Double avgDeltaE;
+	private Double[] maxRGB;
 	private Double[] calR;
 	private Double[] calG;
 	private Double[] calB;
@@ -37,7 +38,7 @@ public class Main {
 	private Double multStep;
 	private Double expStep;
 	private CalibrationMethod cal = new CalibrationMethod(rawData, altData, addOffset, 
-			multOffset, expOffset, deltaE, avgDeltaE, calR, calG, calB, realR, realG, 
+			multOffset, expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
 			realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 			y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
 	public static void main(String[] args) throws FileNotFoundException {
@@ -48,6 +49,7 @@ public class Main {
 		Double[] expOffset = new Double[1];
 		Double[] deltaE = new Double[1];
 		Double avgDeltaE = 0.0;
+		Double[] maxRGB = new Double[1];
 		Double[] calR = new Double[1];
 		Double[] calG = new Double[1];
 		Double[] calB = new Double[1];
@@ -73,11 +75,11 @@ public class Main {
 		Double multStep = 0.0;
 		Double expStep = 0.0;
 		CalibrationMethod cal = new CalibrationMethod(rawData, altData, addOffset, 
-				multOffset, expOffset, deltaE, avgDeltaE, calR, calG, calB, realR, realG, 
+				multOffset, expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
 				realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 				y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
 		Main m = new Main(rawData, altData, addOffset, multOffset,
-				expOffset, deltaE, avgDeltaE, calR, calG, calR, realR, realG, realB,
+				expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 				addStep, multStep, expStep, cal);
@@ -108,6 +110,12 @@ public class Main {
 			cal.setCalG(cal.calculateG(cal.getXYZToRGB(), cal.getX(), cal.getY(), cal.getZ()));
 			cal.setCalB(cal.calculateB(cal.getXYZToRGB(), cal.getX(), cal.getY(), cal.getZ()));
 			
+			cal.setMaxRGB(cal.calculateMaxRGB(cal.getMaxRGB(), cal.getCalR(), cal.getCalG(), cal.getCalB()));			
+			
+			cal.setCalR(cal.scaleRGB(cal.getMaxRGB(), cal.getCalR()));			
+			cal.setCalG(cal.scaleRGB(cal.getMaxRGB(), cal.getCalG()));
+			cal.setCalB(cal.scaleRGB(cal.getMaxRGB(), cal.getCalB()));
+			
 			cal.setDeltaE(cal.calculateDeltaE(cal.getCalLStar(), cal.getCalAStar(), cal.getCalBStar(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
 			
 			cal.setAvgDeltaE(cal.averageDeltaE(cal.getDeltaE()));
@@ -121,7 +129,7 @@ public class Main {
 	}
 	
 	public Main(Double[][] rawData, Double[][] altData, Double[] addOffset, Double[] multOffset, Double[] expOffset,
-			Double[] deltaE, Double avgDeltaE, Double[] calR, Double[] calG, Double[] calB, Double[] realR,
+			Double[] deltaE, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB, Double[] realR,
 			Double[] realG, Double[] realB, Double[] calLStar, Double[] calAStar, Double[] calBStar, Double[] realLStar,
 			Double[] realAStar, Double[] realBStar, Double[] x, Double[] y, Double[] z, Double[] varX, Double[] varY,
 			Double[] varZ, Double[][] xyzToRGB, Double[][] specToXYZ, int numRuns, Double addStep, Double multStep,
@@ -134,6 +142,7 @@ public class Main {
 		this.expOffset = expOffset;
 		this.deltaE = deltaE;
 		this.avgDeltaE = avgDeltaE;
+		this.maxRGB = maxRGB;
 		this.calR = calR;
 		this.calG = calG;
 		this.calB = calB;
@@ -182,6 +191,9 @@ public class Main {
 	}
 	public Double getAvgDeltaE() {
 		return avgDeltaE;
+	}
+	public Double[] getMaxRGB() {
+		return maxRGB;
 	}
 	public Double[] getCalR() {
 		return calR;
@@ -280,6 +292,9 @@ public class Main {
 	}
 	public void setAvgDeltaE(Double avgDeltaE) {
 		this.avgDeltaE = avgDeltaE;
+	}
+	public void setMaxRGB(Double[] maxRGB) {
+		this.maxRGB = maxRGB;
 	}
 	public void setCalR(Double[] calR) {
 		this.calR = calR;
@@ -445,6 +460,12 @@ public class Main {
 		filePath = sc.nextLine();
 		File realB = new File(filePath);
 		cal.setRealB(convertTo1D(readCSV(realB, 1, height)));
+		
+		Double[] maxRGB = new Double[height];
+		for(int i = 0; i < maxRGB.length; i++) {
+			maxRGB[i] = 0.0;			
+		}
+		cal.setMaxRGB(maxRGB);
 		
 		System.out.println("Enter number of runs: ");
 		cal.setNumRuns(sc.nextInt());

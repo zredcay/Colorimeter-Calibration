@@ -9,6 +9,7 @@ public class CalibrationMethod {
 	private Double[] expOffset;
 	private Double[] deltaE;
 	private Double avgDeltaE;
+	private Double[] maxRGB;
 	private Double[] calR;
 	private Double[] calG;
 	private Double[] calB;
@@ -36,7 +37,7 @@ public class CalibrationMethod {
 	
 	//Constructor
 	public CalibrationMethod(Double[][] rawData, Double[][] altData, Double[] addOffset,
-			Double[] multOffset, Double[] expOffset, Double[] deltaE, Double avgDeltaE, Double[] calR, Double[] calG, Double[] calB,
+			Double[] multOffset, Double[] expOffset, Double[] deltaE, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB,
 			Double[] realR, Double[] realG, Double[] realB, Double[] calLStar, Double[] calAStar, Double[] calBStar,
 			Double[] realLStar, Double[] realAStar, Double[] realBStar, Double[] x, Double[] y, Double[] z,
 			Double[] varX, Double[] varY, Double[] varZ, Double[][] xyzToRGB, Double[][] specToXYZ, int numRuns,
@@ -49,6 +50,7 @@ public class CalibrationMethod {
 		this.expOffset = expOffset;
 		this.deltaE = deltaE;
 		this.avgDeltaE = avgDeltaE;
+		this.maxRGB = maxRGB;
 		this.calR = calR;
 		this.calG = calG;
 		this.calB = calB;
@@ -96,6 +98,9 @@ public class CalibrationMethod {
 	}
 	public Double getAvgDeltaE() {
 		return avgDeltaE;
+	}
+	public Double[] getMaxRGB() {
+		return maxRGB;
 	}
 	public Double[] getCalR() {
 		return calR;
@@ -191,6 +196,9 @@ public class CalibrationMethod {
 	}
 	public void setAvgDeltaE(Double avgDeltaE) {
 		this.avgDeltaE = avgDeltaE;
+	}
+	public void setMaxRGB(Double[] maxRGB) {
+		this.maxRGB = maxRGB;
 	}
 	public void setCalR(Double[] calR) {
 		this.calR = calR;
@@ -382,7 +390,6 @@ public class CalibrationMethod {
 	
 	public Double[] calculateR(Double[][] xyzToRGB, Double[] x, Double[] y, Double[] z) {
 		Double[] r = new Double[x.length];
-		
 		for(int i = 0; i < x.length; i++) {
 			r[i] = ((x[i] / 4.3) * xyzToRGB[0][0]) + ((y[i] / 4.3) * xyzToRGB[0][1]) + ((z[i] / 4) * xyzToRGB[0][2]);
 			if (r[i] < 0.0031308) {
@@ -391,18 +398,7 @@ public class CalibrationMethod {
 			else {
 				r[i] = (1.055 * Math.pow(r[i],((1.0/2.4)-0.055)));
 			}
-			
-			if(r[i] > 1.0) {
-				r[i] = 255.0;
-			}
-			else if (r[i] <= 0.0) {
-				r[i] = 0.0;
-			}
-			else {
-				r[i] *= 255;
-			}
 		}
-		
 		return r;
 	}
 	
@@ -417,18 +413,7 @@ public class CalibrationMethod {
 			else {
 				g[i] = (1.055 * Math.pow(g[i],((1.0/2.4)-0.055)));
 			}
-			
-			if(g[i] > 1.0) {
-				g[i] = 255.0;
-			}
-			else if (g[i] <= 0.0) {
-				g[i] = 0.0;
-			}
-			else {
-				g[i] *= 255;
-			}
 		}
-		
 		return g;
 	}
 	
@@ -443,19 +428,39 @@ public class CalibrationMethod {
 			else {
 				b[i] = (1.055 * Math.pow(b[i],((1.0/2.4)-0.055)));
 			}
-			
-			if(b[i] > 1.0) {
-				b[i] = 255.0;
+		}
+		return b;
+	}
+	
+	public Double[] calculateMaxRGB(Double[] maxRGB, Double[] r, Double[] g, Double[] b) {
+		for(int i = 0; i < maxRGB.length; i++) {
+			if(r[i] >= maxRGB[i]) {
+				maxRGB[i] = r[i];
 			}
-			else if (b[i] <= 0.0) {
-				b[i] = 0.0;
+			if(g[i] >= maxRGB[i]) {
+				maxRGB[i] = g[i];
 			}
-			else {
-				b[i] *= 255;
+			if(b[i] >= maxRGB[i]) {
+				maxRGB[i] = b[i];
 			}
 		}
 		
-		return b;
+		return maxRGB;
+	}
+	
+	public Double[] scaleRGB(Double[] maxRGB, Double[] rgb) {
+		for(int i = 0; i < rgb.length; i++) {
+			if(rgb[i] <= 0.0) {
+				rgb[i] = 0.0;
+			}
+			else if (maxRGB[i] > 1) {
+				rgb[i] = 255 * (rgb[i] / maxRGB[i]);
+			} 
+			else {
+				rgb[i] = 255 * rgb[i]; 
+			}
+		}
+		return rgb;
 	}
 	
 	public Double[] calculateDeltaE(Double[] calLStar, Double[] calAStar, Double[] calBStar,
@@ -703,9 +708,6 @@ public class CalibrationMethod {
 			if(tempAvgDeltaE >= (avgDeltaE)) {
 				expOffset[index] = tempExpOffset[index] - expStep;
 				expStep = -expStep;
-				System.out.println("Got to negative switch");
-				System.out.print("Temp Avg Delta E: ");
-				System.out.println(tempAvgDeltaE);
 				return recurAdjustExpOffsets(addOffset, multOffset, 
 						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
 						realLStar, realAStar, realBStar, index);
@@ -713,7 +715,6 @@ public class CalibrationMethod {
 			//Otherwise continue process
 			else {
 				expOffset[index] = tempExpOffset[index];
-				System.out.println("Got to positive continue");
 				return recurAdjustExpOffsets(addOffset, multOffset, 
 						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
 						realLStar, realAStar, realBStar, index);
@@ -724,15 +725,11 @@ public class CalibrationMethod {
 			//If delta e got worse or stayed the same, return
 			if(tempAvgDeltaE >= avgDeltaE) {
 				expOffset[index] = tempExpOffset[index] - expStep;
-				System.out.println("Got to negative return");
-				System.out.print("Temp Avg Delta E: ");
-				System.out.println(tempAvgDeltaE);
 				return expOffset[index];
 			}
 			//Otherwise continue process
 			else {
 				expOffset[index] = tempExpOffset[index];
-				System.out.println("Got to negative continue");
 				return recurAdjustExpOffsets(addOffset, multOffset, 
 						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
 						realLStar, realAStar, realBStar, index);

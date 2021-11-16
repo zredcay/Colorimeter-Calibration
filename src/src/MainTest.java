@@ -5,13 +5,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Before;
 
+//Test should be run individually as when run simultaneously certain tests will 
+//fail. They do pass when run one at a time. 
 class MainTest {
 	private Double[][] rawData;
 	private Double[][] altData;
@@ -257,11 +261,6 @@ class MainTest {
 	}
 	
 	@Test
-	void mainTest() {
-		fail("Not yet implemented");
-	}
-	
-	@Test
 	void readCSVTest() throws FileNotFoundException {
 		Double[][] expected = {{1.0, 2.0}, {3.0, 4.0}}; 
 		File test = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\TestData.csv");
@@ -293,7 +292,6 @@ class MainTest {
 		assertArrayEquals(calMeth.convertDTod1D(main.convertTo1D(test)), calMeth.convertDTod1D(expected),  0.001);
 	}
 	
-	/*
 	@Test
 	void readUserInputTest() throws FileNotFoundException {
 		main.setCal(main.readUserInput(main.getCal()));
@@ -339,7 +337,6 @@ class MainTest {
 		
 		assertEquals(main.getCal().getExpStep(), 0.01, 0.001);
 	}
-	*/
 	
 	@Test
 	void initCalTest() throws FileNotFoundException {
@@ -384,7 +381,97 @@ class MainTest {
 	
 	@Test
 	void printResultsTest() {
-		fail("Not yet implemented");
+		Double[][] testRawData = {{1.0}};
+		Double[][] testAltData = {{1.0}};
+		Double[] testAddOffset = {1.0};
+		Double[] testMultOffset = {1.0};
+		Double[] testExpOffset = {1.0};
+		Double[] testDeltaE = {1.0};
+		Double testAvgDeltaE = 1.0;
+		Double[] testCalR = {1.0};
+		Double[] testCalG = {1.0};
+		Double[] testCalB = {1.0};
+		Double[] testRealR = {1.0};
+		Double[] testRealG = {1.0};
+		Double[] testRealB = {1.0};
+		Double[] testCalLStar = {1.0};
+		Double[] testCalAStar = {1.0};
+		Double[] testCalBStar = {1.0};
+		Double[] testRealLStar = {1.0};
+		Double[] testRealAStar = {1.0};
+		Double[] testRealBStar = {1.0};
+		Double[] testX = {1.0};
+		Double[] testY = {1.0};
+		Double[] testZ = {1.0};
+		Double[] testVarX = {1.0};
+		Double[] testVarY = {1.0};
+		Double[] testVarZ = {1.0};
+		Double[][] testXYZToRGB = {{1.0}};
+		Double[][] testSpecToXYZ = {{1.0}};
+		int testNumRuns = 1;
+		Double testAddStep = 1.0;
+		Double testMultStep = 1.0;
+		Double testExpStep = 1.0;
+		
+		main.getCal().setAddOffset(testAddOffset);
+		main.getCal().setMultOffset(testMultOffset);
+		main.getCal().setExpOffset(testExpOffset);
+		main.getCal().setAddStep(testAddStep);
+		main.getCal().setMultStep(testMultStep);
+		main.getCal().setExpStep(testExpStep);
+		main.getCal().setNumRuns(testNumRuns);
+		main.getCal().setSpecToXYZ(testSpecToXYZ);
+		main.getCal().setXYZToRGB(testXYZToRGB);
+		main.getCal().setVarX(testVarX);
+		main.getCal().setVarY(testVarY);
+		main.getCal().setVarZ(testVarZ);
+		main.getCal().setX(testX);
+		main.getCal().setY(testY);
+		main.getCal().setZ(testZ);
+		main.getCal().setRealLStar(testRealLStar);
+		main.getCal().setRealAStar(testRealAStar);
+		main.getCal().setRealBStar(testRealBStar);
+		main.getCal().setCalLStar(testCalLStar);
+		main.getCal().setCalAStar(testCalAStar);
+		main.getCal().setCalBStar(testCalBStar);
+		main.getCal().setRealR(testRealR);
+		main.getCal().setRealG(testRealG);
+		main.getCal().setRealB(testRealB);
+		main.getCal().setCalR(testCalR);
+		main.getCal().setCalG(testCalG);
+		main.getCal().setCalB(testCalB);
+		main.getCal().setDeltaE(testDeltaE);
+		main.getCal().setAvgDeltaE(testAvgDeltaE);
+		main.getCal().setRawData(testRawData);
+		main.getCal().setAltData(testAltData);
+		
+		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+	    System.setOut(new PrintStream(outContent));
+
+		main.printResults(main.getCal());
+		String expectedOutput = "Results:\r\n"
+				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
+				+ "1.0 \r\n"
+				+ "Add:\r\n"
+				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
+				+ "1.0 \r\n"
+				+ "Mult:\r\n"
+				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
+				+ "1.0 \r\n"
+				+ "Exp:\r\n"
+				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
+				+ "1.0 \r\n"
+				+ "CIELAB:\r\n"
+				+ "L, A, B:\r\n"
+				+ "	Sample 1: 1.0, 1.0, 1.0\r\n"
+				+ "RGB:\r\n"
+				+ "R, G, B:\r\n"
+				+ "	Sample 1: 1.0, 1.0, 1.0\r\n"
+				+ "Delta E:\r\n"
+				+ "	Sample 1: 1.0\r\n"
+				+ "Average Delta E: 1.0\r\n"
+				+ "";
+		assertEquals(expectedOutput, outContent.toString());
 	}
 	
 }

@@ -90,10 +90,6 @@ public class Main {
 		
 		System.out.println("Calibrating...");
 		for(int i = 0; i < cal.getNumRuns(); i++) {
-			cal.setMultOffset(cal.getMultOffset());
-			cal.setAddOffset(cal.getAddOffset());
-			cal.setExpOffset(cal.getExpOffset());
-			
 			cal.setAltData(cal.applyOffsets(cal.getRawData(), cal.getAddOffset(), cal.getMultOffset(), cal.getExpOffset()));
 			
 			cal.setX(cal.calculateX(cal.getAltData(), cal.getSpecToXYZ()[0]));

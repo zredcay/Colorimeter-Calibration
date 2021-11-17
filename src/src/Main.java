@@ -540,6 +540,13 @@ public class Main {
 		}
 		System.out.println();
 		
+		System.out.println("XYZ:");
+		System.out.println("X, Y, Z:");
+		for(int i = 0; i < cal.getX().length; i++) {
+			int num = i + 1;
+			System.out.println("	Sample " + num + ": " + cal.getX()[i] + ", " + cal.getY()[i] + ", " + cal.getZ()[i]);
+		}
+		
 		System.out.println("CIELAB:");
 		System.out.println("L, A, B:");
 		for(int i = 0; i < cal.getCalLStar().length; i++) {

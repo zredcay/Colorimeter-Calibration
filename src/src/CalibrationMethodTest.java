@@ -221,9 +221,9 @@ class CalibrationMethodTest {
 	
 	@Test
 	public void testCalXYZ() {
-		Double[] testX = {6.0, 6.0, 6.0};
-		Double[] testY = {6.0, 6.0, 6.0};
-		Double[] testZ = {6.0, 6.0, 6.0};
+		Double[] testX = {3.0, 3.0, 3.0};
+		Double[] testY = {3.0, 3.0, 3.0};
+		Double[] testZ = {3.0, 3.0, 3.0};
 		Double[][] testRawData = {{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 		Double[][] testSpecToXYZ = {{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
 		
@@ -238,42 +238,50 @@ class CalibrationMethodTest {
 		
 		calMeth.setZ(calMeth.calculateZ(calMeth.getRawData(), calMeth.getSpecToXYZ()[2]));
 		assertTrue(Arrays.deepEquals(calMeth.getZ(), testZ));
+		
+		Double[] testX1 = {49.02, 11.02, 3.93};
+		Double[] testY1 = {52.07, 6.81, 6.10};
+		Double[] testZ1 = {36.14, 2.51, 10.61};
+		Double[][] testRawData1 = {{2.00, 6.47, 10.00, 8.00, 12.00, 9.87, 11.33, 15.00, 6.67, 2.00, 12.00, 2.00, 1.00, 1.00}, 
+				{0.00, 1.00, 0.00, 1.00, 1.00, 0.00, 0.20, 2.00, 5.20, 3.00, 6.00, 2.00, 2.00, 1.00}, 
+				{0.00, 1.80, 3.00, 3.00, 3.00, 1.00, 1.00, 1.00, 0.00, 1.00, 0.00, 0.00, 1.00, 0.00}};
+		Double[][] testSpecToXYZ1 = {{0.08277331, 0.3693084, 0.3013112, 0.0383677, 0.03778185, 0.3046991, 0.7123849, 1.106886, 0.3496358, 0.006809147, 1.048485, 0.04221473, 0.001061495, 0.0001287394}, 
+				{0.01041303, 0.06047429, 0.1414586, 0.3109438, 0.6248296, 0.9233858, 0.9944304, 0.8370838, 0.1410203, 0.002619372, 0.5282296, 0.01628841, 0.0004098928, 0.00005018934}, 
+				{0.3832822, 1.867751, 1.76844, 0.5549619, 0.08852389, 0.009753, 0.0008779264, 0.00008183954, 0.0, 0.0, 0.00000953013, 0.0, 0.0, 0.0}};
+		
+		calMeth.setRawData(testRawData1);
+		calMeth.setSpecToXYZ(testSpecToXYZ1);
+		
+		calMeth.setX(calMeth.calculateX(calMeth.getRawData(), calMeth.getSpecToXYZ()[0]));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getX()), calMeth.convertDTod1D(testX1), 0.01);
+		
+		calMeth.setY(calMeth.calculateY(calMeth.getRawData(), calMeth.getSpecToXYZ()[1]));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getY()), calMeth.convertDTod1D(testY1), 0.01);
+		
+		calMeth.setZ(calMeth.calculateZ(calMeth.getRawData(), calMeth.getSpecToXYZ()[2]));
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getZ()), calMeth.convertDTod1D(testZ1), 0.01);
 	
 	}
 	
 	@Test
 	public void testCalVarXYZ() {
-		Double[] testX = {34.4, 34.4, 34.4};
-		Double[] testY = {34.4, 34.4, 34.4};
-		Double[] testZ = {32.0, 32.0, 32.0};
-		Double[] testVarX = {1.99, 1.99, 1.99};
-		Double[] testVarY = {1.99, 1.99, 1.99};
-		Double[] testVarZ = {1.99, 1.99, 1.99};
+		Double[] testX = {34.4, 0.03, 49.02, 11.02, 3.93};
+		Double[] testY = {34.4, 0.03, 52.07, 6.81, 6.10};
+		Double[] testZ = {32.0, 0.03, 36.14, 2.51, 10.61};
+		Double[] testVarX = {1.999, 0.192, 2.251, 1.368, 0.970};
+		Double[] testVarY = {1.999, 0.192, 2.296, 1.166, 1.124};
+		Double[] testVarZ = {1.999, 0.196, 2.083, 0.856, 1.384};
 		
 		calMeth.setVarX(calMeth.calculateVarX(testX));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarX()), calMeth.convertDTod1D(testVarX), 0.01);
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarX()), calMeth.convertDTod1D(testVarX), 0.001);
 		
 		calMeth.setVarY(calMeth.calculateVarY(testY));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarY()), calMeth.convertDTod1D(testVarY), 0.01);
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarY()), calMeth.convertDTod1D(testVarY), 0.001);
 		
 		calMeth.setVarZ(calMeth.calculateVarZ(testZ));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarZ()), calMeth.convertDTod1D(testVarZ), 0.01);
+		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarZ()), calMeth.convertDTod1D(testVarZ), 0.001);
 		
-		Double[] testX1 = {0.03, 0.03, 0.03};
-		Double[] testY1 = {0.03, 0.03, 0.03};
-		Double[] testZ1 = {0.03, 0.03, 0.03};
-		Double[] testVarX1 = {0.054, 0.054, 0.054};
-		Double[] testVarY1 = {0.054, 0.054, 0.054};
-		Double[] testVarZ1 = {0.054, 0.054, 0.054};
 		
-		calMeth.setVarX(calMeth.calculateVarX(testX1));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarX()), calMeth.convertDTod1D(testVarX1), 0.01);
-		
-		calMeth.setVarY(calMeth.calculateVarY(testY1));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarY()), calMeth.convertDTod1D(testVarY1), 0.01);
-		
-		calMeth.setVarZ(calMeth.calculateVarZ(testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(calMeth.getVarZ()), calMeth.convertDTod1D(testVarZ1), 0.01);
 	}
 	
 	@Test
@@ -297,12 +305,12 @@ class CalibrationMethodTest {
 	
 	@Test
 	void testCalRGB() {
-		Double[] testX = {1.0};
-		Double[] testY = {1.0};
-		Double[] testZ = {1.0};
-		Double[] testR = {0.6574};
-		Double[] testG = {0.6118};
-		Double[] testB = {0.6224};
+		Double[] testX = {1.0, 0.01};
+		Double[] testY = {1.0, 0.01};
+		Double[] testZ = {1.0, 0.01};
+		Double[] testR = {0.6574, 0.0349};
+		Double[] testG = {0.6118, 0.0286};
+		Double[] testB = {0.6224, 0.0300};
 		Double[][] xyzToRGB = {{3.24, -1.54, -0.5}, {-0.97, 1.88, 0.04}, {0.06, -0.2, 1.06}};
 		
 		calMeth.setCalR(calMeth.calculateR(xyzToRGB, testX, testY, testZ));
@@ -313,22 +321,6 @@ class CalibrationMethodTest {
 		
 		calMeth.setCalB(calMeth.calculateB(xyzToRGB, testX, testY, testZ));
 		assertArrayEquals(calMeth.convertDTod1D(testB), calMeth.convertDTod1D(calMeth.getCalB()), 0.0001);
-		
-		Double[] testX1 = {0.01};
-		Double[] testY1 = {0.01};
-		Double[] testZ1 = {0.01};
-		Double[] testR1 = {0.0349};
-		Double[] testG1 = {0.0286};
-		Double[] testB1 = {0.0300};
-		
-		calMeth.setCalR(calMeth.calculateR(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testR1), calMeth.convertDTod1D(calMeth.getCalR()), 0.0001);
-		
-		calMeth.setCalG(calMeth.calculateG(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testG1), calMeth.convertDTod1D(calMeth.getCalG()), 0.0001);
-		
-		calMeth.setCalB(calMeth.calculateB(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testB1), calMeth.convertDTod1D(calMeth.getCalB()), 0.0001);
 	}
 	
 	@Test
@@ -356,69 +348,37 @@ class CalibrationMethodTest {
 	
 	@Test
 	void testScaleRGB() {
-		Double[] testR = {0.6574};
-		Double[] testG = {0.6118};
-		Double[] testB = {0.6224};
-		Double[] expectedR = {167.62};
-		Double[] expectedG = {156.00};
-		Double[] expectedB = {158.71};
+		Double[] testR = {0.6574, 0.0, 1.0};
+		Double[] testG = {0.6118, 0.0, 1.0};
+		Double[] testB = {0.6224, 0.0, 1.0};
+		Double[] expectedR = {167.62, 0.0, 127.5};
+		Double[] expectedG = {156.00, 0.0, 127.5};
+		Double[] expectedB = {158.71, 0.0, 127.5};
+		Double[] testMaxRGB = {0.0, 0.0, 2.0};
 		
-		calMeth.setCalR(calMeth.scaleRGB(testR, testR));
+		calMeth.setCalR(calMeth.scaleRGB(testMaxRGB, testR));
 		assertArrayEquals(calMeth.convertDTod1D(expectedR), calMeth.convertDTod1D(calMeth.getCalR()), 0.1);
 		
-		calMeth.setCalG(calMeth.scaleRGB(testG, testG));
+		calMeth.setCalG(calMeth.scaleRGB(testMaxRGB, testG));
 		assertArrayEquals(calMeth.convertDTod1D(expectedG), calMeth.convertDTod1D(calMeth.getCalG()), 0.1);
 		
-		calMeth.setCalB(calMeth.scaleRGB(testB, testB));
+		calMeth.setCalB(calMeth.scaleRGB(testMaxRGB, testB));
 		assertArrayEquals(calMeth.convertDTod1D(expectedB), calMeth.convertDTod1D(calMeth.getCalB()), 0.1);
-		
-		Double[] testR1 = {0.0};
-		Double[] testG1 = {0.0};
-		Double[] testB1 = {0.0};
-		Double[] expectedR1 = {0.0};
-		Double[] expectedG1 = {0.0};
-		Double[] expectedB1 = {0.0};
-		
-		calMeth.setCalR(calMeth.scaleRGB(testR1, testR1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedR1), calMeth.convertDTod1D(calMeth.getCalR()), 0.1);
-		
-		calMeth.setCalG(calMeth.scaleRGB(testG1, testG1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedG1), calMeth.convertDTod1D(calMeth.getCalG()), 0.1);
-		
-		calMeth.setCalB(calMeth.scaleRGB(testB1, testB1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedB1), calMeth.convertDTod1D(calMeth.getCalB()), 0.1);
-		
-		Double[] testMaxRGB = {2.0};
-		Double[] testR2 = {1.0};
-		Double[] testG2 = {1.0};
-		Double[] testB2 = {1.0};
-		Double[] expectedR2 = {127.5};
-		Double[] expectedG2 = {127.5};
-		Double[] expectedB2 = {127.5};
-		
-		calMeth.setCalR(calMeth.scaleRGB(testMaxRGB, testR2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedR2), calMeth.convertDTod1D(calMeth.getCalR()), 0.1);
-		
-		calMeth.setCalG(calMeth.scaleRGB(testMaxRGB, testG2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedG2), calMeth.convertDTod1D(calMeth.getCalG()), 0.1);
-		
-		calMeth.setCalB(calMeth.scaleRGB(testMaxRGB, testB2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedB2), calMeth.convertDTod1D(calMeth.getCalB()), 0.1);
 	}
 
 	@Test
 	void testFullCalcRGB() {
-		Double[] testX = {49.0};
-		Double[] testY = {52.1};
-		Double[] testZ = {36.1};
-		Double[] testR = {2.7223};
-		Double[] testG = {2.5982};
-		Double[] testB = {2.2204};
+		Double[] testX = {49.0, 0.0, 26.8};
+		Double[] testY = {52.1, 0.0, 26.6};
+		Double[] testZ = {36.1, 0.0, 10.5};
+		Double[] testR = {2.7223, 0.0, 2.3683};
+		Double[] testG = {2.5982, 0.0, 1.9785};
+		Double[] testB = {2.2204, 0.0, 1.3355};
 		Double[][] xyzToRGB = {{3.24, -1.54, -0.5}, {-0.97, 1.88, 0.04}, {0.06, -0.2, 1.06}};
-		Double[] testMaxRGB = {0.0};
-		Double[] expectedR = {255.0};
-		Double[] expectedG = {243.38};
-		Double[] expectedB = {207.99};
+		Double[] testMaxRGB = {0.0, 0.0, 0.0};
+		Double[] expectedR = {255.0, 0.0, 255.0};
+		Double[] expectedG = {243.38, 0.0, 213.03};
+		Double[] expectedB = {207.99, 0.0, 143.8};
 		
 		calMeth.setCalR(calMeth.calculateR(xyzToRGB, testX, testY, testZ));
 		assertArrayEquals(calMeth.convertDTod1D(testR), calMeth.convertDTod1D(calMeth.getCalR()), 0.0001);
@@ -440,82 +400,18 @@ class CalibrationMethodTest {
 		
 		calMeth.setCalB(calMeth.scaleRGB(calMeth.getMaxRGB(), testB));
 		assertArrayEquals(calMeth.convertDTod1D(expectedB), calMeth.convertDTod1D(calMeth.getCalB()), 0.01);
-		
-		Double[] testX1 = {0.0};
-		Double[] testY1 = {0.0};
-		Double[] testZ1 = {0.0};
-		Double[] testR1 = {0.0};
-		Double[] testG1 = {0.0};
-		Double[] testB1 = {0.0};
-		testMaxRGB[0] = 0.0;
-		Double[] expectedR1 = {0.0};
-		Double[] expectedG1 = {0.0};
-		Double[] expectedB1 = {0.0};
-		
-		calMeth.setCalR(calMeth.calculateR(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testR1), calMeth.convertDTod1D(calMeth.getCalR()), 0.0001);
-		
-		calMeth.setCalG(calMeth.calculateG(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testG1), calMeth.convertDTod1D(calMeth.getCalG()), 0.0001);
-		
-		calMeth.setCalB(calMeth.calculateB(xyzToRGB, testX1, testY1, testZ1));
-		assertArrayEquals(calMeth.convertDTod1D(testB1), calMeth.convertDTod1D(calMeth.getCalB()), 0.0001);
-		
-		calMeth.setMaxRGB(calMeth.calculateMaxRGB(testMaxRGB, testR1, testG1, testB1));
-		assertArrayEquals(calMeth.convertDTod1D(testR1), calMeth.convertDTod1D(calMeth.getMaxRGB()), 0.0001);
-		
-		calMeth.setCalR(calMeth.scaleRGB(calMeth.getMaxRGB(), testR1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedR1), calMeth.convertDTod1D(calMeth.getCalR()), 0.01);
-		
-		calMeth.setCalG(calMeth.scaleRGB(calMeth.getMaxRGB(), testG1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedG1), calMeth.convertDTod1D(calMeth.getCalG()), 0.01);
-		
-		calMeth.setCalB(calMeth.scaleRGB(calMeth.getMaxRGB(), testB1));
-		assertArrayEquals(calMeth.convertDTod1D(expectedB1), calMeth.convertDTod1D(calMeth.getCalB()), 0.01);
-		
-		Double[] testX2 = {26.8};
-		Double[] testY2 = {26.6};
-		Double[] testZ2 = {10.5};
-		Double[] testR2 = {2.3683};
-		Double[] testG2 = {1.9785};
-		Double[] testB2 = {1.3355};
-		testMaxRGB[0] = 0.0;
-		Double[] expectedR2 = {255.0};
-		Double[] expectedG2 = {213.03};
-		Double[] expectedB2 = {143.8};
-		
-		calMeth.setCalR(calMeth.calculateR(xyzToRGB, testX2, testY2, testZ2));
-		assertArrayEquals(calMeth.convertDTod1D(testR2), calMeth.convertDTod1D(calMeth.getCalR()), 0.0001);
-		
-		calMeth.setCalG(calMeth.calculateG(xyzToRGB, testX2, testY2, testZ2));
-		assertArrayEquals(calMeth.convertDTod1D(testG2), calMeth.convertDTod1D(calMeth.getCalG()), 0.0001);
-		
-		calMeth.setCalB(calMeth.calculateB(xyzToRGB, testX2, testY2, testZ2));
-		assertArrayEquals(calMeth.convertDTod1D(testB2), calMeth.convertDTod1D(calMeth.getCalB()), 0.0001);
-		
-		calMeth.setMaxRGB(testMaxRGB);
-		calMeth.setMaxRGB(calMeth.calculateMaxRGB(testMaxRGB, testR2, testG2, testB2));
-		assertArrayEquals(calMeth.convertDTod1D(testR2), calMeth.convertDTod1D(calMeth.getMaxRGB()), 0.0001);
-		
-		calMeth.setCalR(calMeth.scaleRGB(calMeth.getMaxRGB(), testR2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedR2), calMeth.convertDTod1D(calMeth.getCalR()), 0.01);
-		
-		calMeth.setCalG(calMeth.scaleRGB(calMeth.getMaxRGB(), testG2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedG2), calMeth.convertDTod1D(calMeth.getCalG()), 0.01);
-		
-		calMeth.setCalB(calMeth.scaleRGB(calMeth.getMaxRGB(), testB2));
-		assertArrayEquals(calMeth.convertDTod1D(expectedB2), calMeth.convertDTod1D(calMeth.getCalB()), 0.01);
 	}
 	
 	@Test
 	void testCalDeltaE() {
-		Double[] testCalLStar = {100.0, 100.0, 100.0};
-		Double[] testCalAStar = {100.0, 100.0, 100.0};
-		Double[] testCalBStar = {100.0, 100.0, 100.0};
-		Double[] testRealLStar = {90.0, 90.0, 90.0};
-		Double[] testRealAStar = {90.0, 90.0, 90.0};
-		Double[] testRealBStar = {90.0, 90.0, 90.0};
-		Double[] testDeltaE = {17.32, 17.32, 17.32};
+		Double[] testCalLStar = {100.0, 248.2, 0.0};
+		Double[] testCalAStar = {100.0, -22.4, 0.0};
+		Double[] testCalBStar = {100.0, 41.9, 0.0};
+		Double[] testRealLStar = {90.0, 61.0, 2.0};
+		Double[] testRealAStar = {90.0, 1.0, 0.0};
+		Double[] testRealBStar = {90.0, 9.0, 0.0};
+		Double[] testDeltaE = {17.32, 191.5, 2.0};
+		
 		calMeth.setDeltaE(calMeth.calculateDeltaE(testCalLStar, testCalAStar, testCalBStar, testRealLStar, testRealAStar, testRealBStar));
 		assertArrayEquals(calMeth.convertDTod1D(calMeth.getDeltaE()), calMeth.convertDTod1D(testDeltaE), 0.01);
 	}

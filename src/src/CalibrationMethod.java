@@ -281,7 +281,7 @@ public class CalibrationMethod {
 		for(int i = 0; i < specData.length; i++) {
 			temp = 0.0;
 			for(int j = 0; j < specToX.length; j++) {
-				temp += specData[i][j] + specToX[j];
+				temp += specData[i][j] * specToX[j];
 			}
 			x[i] = temp;
 		}
@@ -295,7 +295,7 @@ public class CalibrationMethod {
 		for(int i = 0; i < specData.length; i++) {
 			temp = 0.0;
 			for(int j = 0; j < specToY.length; j++) {
-				temp += specData[i][j] + specToY[j];
+				temp += specData[i][j] * specToY[j];
 			}
 			y[i] = temp;
 		}
@@ -309,7 +309,7 @@ public class CalibrationMethod {
 		for(int i = 0; i < specData.length; i++) {
 			temp = 0.0;
 			for(int j = 0; j < specToZ.length; j++) {
-				temp += specData[i][j] + specToZ[j];
+				temp += specData[i][j] * specToZ[j];
 			}
 			z[i] = temp;
 		}
@@ -318,13 +318,15 @@ public class CalibrationMethod {
 	
 	public Double[] calculateVarX(Double[] x) {
 		Double[] varX = new Double[x.length];
+		Double t = (double) 0.3333333333333333;
+		Double s = (double) 0.1379310345;
 		
 		for(int i = 0; i < x.length; i++) {
 			if((x[i] / 4.3) > 0.008856) {
-				varX[i] = Math.pow((x[i] / 4.3), 0.333);
+				varX[i] = Math.pow((x[i] / 4.3), t);
 			}
 			else {
-				varX[i] = ((x[i] / 4.3) * 7.787) + (16 / 116);
+				varX[i] = (((x[i] / 4.3) * 7.787) + s);
 			}
 		}
 		
@@ -333,13 +335,16 @@ public class CalibrationMethod {
 	
 	public Double[] calculateVarY(Double[] y) {
 		Double[] varY = new Double[y.length];
-		
+		Double t = (double) (0.3333333333333333);
+		Double s = (double) 0.1379310345;
+
 		for(int i = 0; i < y.length; i++) {
 			if((y[i] / 4.3) > 0.008856) {
-				varY[i] = Math.pow((y[i] / 4.3), 0.333);
+				varY[i] = Math.pow((y[i] / 4.3), t);
 			}
 			else {
-				varY[i] = ((y[i] / 4.3) * 7.787) + (16 / 116);
+				varY[i] = (((y[i] / 4.3) * 7.787) + s);
+				
 			}
 		}
 		
@@ -348,13 +353,15 @@ public class CalibrationMethod {
 	
 	public Double[] calculateVarZ(Double[] z) {
 		Double[] varZ = new Double[z.length];
-		
+		Double t = (double) (0.3333333333333333);
+		Double s = (double) 0.1379310345;
+
 		for(int i = 0; i < z.length; i++) {
 			if((z[i] / 4) > 0.008856) {
-				varZ[i] = Math.pow((z[i] / 4.0), 0.333);
+				varZ[i] = Math.pow((z[i] / 4.0), t);
 			}
 			else {
-				varZ[i] = ((z[i] / 4) * 7.787) + (16 / 116);
+				varZ[i] = (((z[i] / 4) * 7.787) + s);
 			}
 		}
 		

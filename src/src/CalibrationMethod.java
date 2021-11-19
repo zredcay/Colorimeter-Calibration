@@ -493,7 +493,7 @@ public class CalibrationMethod {
 	}
 	
 	public Double[][] applyOffsets(Double[][] rawData, Double[] addOffset, Double[] multOffset, 
-			Double[] expOffset){
+		Double[] expOffset){
 		Double[][] offsetData = new Double[rawData.length][rawData[0].length];
 		
 		for(int i = 0; i < rawData.length; i++) {
@@ -513,17 +513,7 @@ public class CalibrationMethod {
 	
 	public Double[] adjustAddOffsets(Double[] addOffset, Double[] multOffset, 
 			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double addStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {		
-		for(int i = addOffset.length - 1; i > 0; i--) {
-			addOffset[i] = recurAdjustAddOffsets(addOffset, multOffset, expOffset, 
-					avgDeltaE, rawData, addStep, specToXYZ, realLStar, realAStar, realBStar, i);
-		}
-		return addOffset;
-	}
-	
-	public Double recurAdjustAddOffsets(Double[] addOffset, Double[] multOffset, 
-			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double addStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar, int index) {
+			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {
 		//Set up vars
 		Double[] tempAddOffset = addOffset;
 		Double[][] tempData = new Double[rawData.length][rawData[0].length];
@@ -538,70 +528,88 @@ public class CalibrationMethod {
 		Double[] calAStar = new Double[rawData.length];
 		Double[] calBStar = new Double[rawData.length];
 		
-		//Apply step and calculate avg delta e
-		tempAddOffset[index] += addStep;
-		tempData = applyOffsets(rawData, tempAddOffset, multOffset, expOffset);
-		x = calculateX(tempData, specToXYZ[0]);
-		y = calculateY(tempData, specToXYZ[1]);
-		z = calculateZ(tempData, specToXYZ[2]);
-		varX = calculateVarX(x);
-		varY = calculateVarY(y);
-		varZ = calculateVarZ(z);
-		calLStar = calculateLStar(varY);
-		calAStar = calculateAStar(varX, varY);
-		calBStar = calculateBStar(varY, varZ);
-		tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
-				calBStar, realLStar, realAStar, realBStar));
-		
-		//If step is positive
-		if(addStep > 0.0) {
-			//If delta e got worse or stayed the same, try other direction
-			if(tempAvgDeltaE >= (avgDeltaE)) {
-				addOffset[index] = tempAddOffset[index] - addStep;
-				addStep = -addStep;
-				return recurAdjustAddOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, addStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-			//Otherwise continue process
-			else {
-				addOffset[index] = tempAddOffset[index];
-				return recurAdjustAddOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, addStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-		}
-		//If step is negative
-		else {
-			//If delta e got worse or stayed the same, return
-			if(tempAvgDeltaE >= avgDeltaE) {
-				addOffset[index] = tempAddOffset[index] - addStep;
-				return addOffset[index];
-			}
-			//Otherwise continue process
-			else {
-				addOffset[index] = tempAddOffset[index];
-				return recurAdjustAddOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, addStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
+		for(int i = addOffset.length - 1; i > 0; i--) {
+			System.out.println("Offset " + i);
+			Boolean k = true;
+			while(k) {
+				//Apply step and calculate avg delta e
+				tempAddOffset[i] += addStep;
+				tempData = applyOffsets(rawData, tempAddOffset, multOffset, expOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempAddOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					addOffset[i] = tempAddOffset[i] - addStep;
+					k = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					addOffset[i] = tempAddOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
 			}
 		}
 		
+		addStep = -addStep;
+		
+		for(int i = addOffset.length - 1; i > 0; i--) {
+			Boolean l = true;
+			while(l) {
+				//Apply step and calculate avg delta e
+				tempAddOffset[i] += addStep;
+				tempData = applyOffsets(rawData, tempAddOffset, multOffset, expOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempAddOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					addOffset[i] = tempAddOffset[i] - addStep;
+					l = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					addOffset[i] = tempAddOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
+			}
+		}
+		return addOffset;
 	}
 
 	public Double[] adjustMultOffsets(Double[] addOffset, Double[] multOffset, 
 			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double multStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {		
-		for(int i = multOffset.length - 1; i > 0; i--) {
-			multOffset[i] = recurAdjustMultOffsets(addOffset, multOffset, expOffset, 
-					avgDeltaE, rawData, multStep, specToXYZ, realLStar, realAStar, realBStar, i);
-		}
-		return multOffset;
-	}
-	
-	public Double recurAdjustMultOffsets(Double[] addOffset, Double[] multOffset, 
-			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double multStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar, int index) {
+			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {
 		//Set up vars
 		Double[] tempMultOffset = multOffset;
 		Double[][] tempData = new Double[rawData.length][rawData[0].length];
@@ -616,70 +624,88 @@ public class CalibrationMethod {
 		Double[] calAStar = new Double[rawData.length];
 		Double[] calBStar = new Double[rawData.length];
 		
-		//Apply step and calculate avg delta e
-		tempMultOffset[index] += multStep;
-		tempData = applyOffsets(rawData, addOffset, tempMultOffset, expOffset);
-		x = calculateX(tempData, specToXYZ[0]);
-		y = calculateY(tempData, specToXYZ[1]);
-		z = calculateZ(tempData, specToXYZ[2]);
-		varX = calculateVarX(x);
-		varY = calculateVarY(y);
-		varZ = calculateVarZ(z);
-		calLStar = calculateLStar(varY);
-		calAStar = calculateAStar(varX, varY);
-		calBStar = calculateBStar(varY, varZ);
-		tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
-				calBStar, realLStar, realAStar, realBStar));
-		
-		//If step is positive
-		if(multStep > 0.0) {
-			//If delta e got worse or stayed the same, try other direction
-			if(tempAvgDeltaE >= (avgDeltaE)) {
-				multOffset[index] = tempMultOffset[index] - multStep;
-				multStep = -multStep;
-				return recurAdjustMultOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, multStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-			//Otherwise continue process
-			else {
-				multOffset[index] = tempMultOffset[index];
-				return recurAdjustMultOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, multStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-		}
-		//If step is negative
-		else {
-			//If delta e got worse or stayed the same, return
-			if(tempAvgDeltaE >= avgDeltaE) {
-				multOffset[index] = tempMultOffset[index] - multStep;
-				return multOffset[index];
-			}
-			//Otherwise continue process
-			else {
-				multOffset[index] = tempMultOffset[index];
-				return recurAdjustMultOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, multStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
+		for(int i = multOffset.length - 1; i > 0; i--) {
+			System.out.println("Offset " + i);
+			Boolean k = true;
+			while(k) {
+				//Apply step and calculate avg delta e
+				tempMultOffset[i] += multStep;
+				tempData = applyOffsets(rawData, addOffset, tempMultOffset, expOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempMultOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || (tempMultOffset[i] <= 0.0001) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					multOffset[i] = tempMultOffset[i] - multStep;
+					k = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					multOffset[i] = tempMultOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
 			}
 		}
 		
+		multStep = -multStep;
+		
+		for(int i = multOffset.length - 1; i > 0; i--) {
+			Boolean l = true;
+			while(l) {
+				//Apply step and calculate avg delta e
+				tempMultOffset[i] += multStep;
+				tempData = applyOffsets(rawData, addOffset, tempMultOffset, expOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempMultOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || (tempMultOffset[i] <= 0.0001) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					multOffset[i] = tempMultOffset[i] - multStep;
+					l = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					multOffset[i] = tempMultOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
+			}
+		}
+		return multOffset;
 	}
-	
+
 	public Double[] adjustExpOffsets(Double[] addOffset, Double[] multOffset, 
 			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double expStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {		
-		for(int i = expOffset.length - 1; i > 0; i--) {
-			expOffset[i] = recurAdjustExpOffsets(addOffset, multOffset, expOffset, 
-					avgDeltaE, rawData, expStep, specToXYZ, realLStar, realAStar, realBStar, i);
-		}
-		return expOffset;
-	}
-	
-	public Double recurAdjustExpOffsets(Double[] addOffset, Double[] multOffset, 
-			Double[] expOffset, Double avgDeltaE, Double[][] rawData, Double expStep, 
-			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar, int index) {
+			Double[][] specToXYZ, Double[] realLStar, Double[] realAStar, Double[] realBStar) {
 		//Set up vars
 		Double[] tempExpOffset = expOffset;
 		Double[][] tempData = new Double[rawData.length][rawData[0].length];
@@ -694,55 +720,83 @@ public class CalibrationMethod {
 		Double[] calAStar = new Double[rawData.length];
 		Double[] calBStar = new Double[rawData.length];
 		
-		//Apply step and calculate avg delta e
-		tempExpOffset[index] += expStep;
-		tempData = applyOffsets(rawData, addOffset, multOffset, tempExpOffset);
-		x = calculateX(tempData, specToXYZ[0]);
-		y = calculateY(tempData, specToXYZ[1]);
-		z = calculateZ(tempData, specToXYZ[2]);
-		varX = calculateVarX(x);
-		varY = calculateVarY(y);
-		varZ = calculateVarZ(z);
-		calLStar = calculateLStar(varY);
-		calAStar = calculateAStar(varX, varY);
-		calBStar = calculateBStar(varY, varZ);
-		tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
-				calBStar, realLStar, realAStar, realBStar));
-		
-		//If step is positive
-		if(expStep > 0.0) {
-			//If delta e got worse or stayed the same, try other direction
-			if(tempAvgDeltaE >= (avgDeltaE)) {
-				expOffset[index] = tempExpOffset[index] - expStep;
-				expStep = -expStep;
-				return recurAdjustExpOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-			//Otherwise continue process
-			else {
-				expOffset[index] = tempExpOffset[index];
-				return recurAdjustExpOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
-			}
-		}
-		//If step is negative
-		else {
-			//If delta e got worse or stayed the same, return
-			if(tempAvgDeltaE >= avgDeltaE) {
-				expOffset[index] = tempExpOffset[index] - expStep;
-				return expOffset[index];
-			}
-			//Otherwise continue process
-			else {
-				expOffset[index] = tempExpOffset[index];
-				return recurAdjustExpOffsets(addOffset, multOffset, 
-						expOffset, tempAvgDeltaE, rawData, expStep, specToXYZ, 
-						realLStar, realAStar, realBStar, index);
+		for(int i = expOffset.length - 1; i > 0; i--) {
+			System.out.println("Offset " + i);
+			Boolean k = true;
+			while(k) {
+				//Apply step and calculate avg delta e
+				tempExpOffset[i] += expStep;
+				tempData = applyOffsets(rawData, addOffset, multOffset, tempExpOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempExpOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || (tempExpOffset[i] <= 0.01) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					expOffset[i] = tempExpOffset[i] - expStep;
+					k = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					expOffset[i] = tempExpOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
 			}
 		}
 		
+		expStep = -expStep;
+		
+		for(int i = expOffset.length - 1; i > 0; i--) {
+			Boolean l = true;
+			while(l) {
+				//Apply step and calculate avg delta e
+				tempExpOffset[i] += expStep;
+				tempData = applyOffsets(rawData, addOffset, multOffset, tempExpOffset);
+				x = calculateX(tempData, specToXYZ[0]);
+				y = calculateY(tempData, specToXYZ[1]);
+				z = calculateZ(tempData, specToXYZ[2]);
+				varX = calculateVarX(x);
+				varY = calculateVarY(y);
+				varZ = calculateVarZ(z);
+				calLStar = calculateLStar(varY);
+				calAStar = calculateAStar(varX, varY);
+				calBStar = calculateBStar(varY, varZ);
+				tempAvgDeltaE = averageDeltaE(calculateDeltaE(calLStar, calAStar, 
+						calBStar, realLStar, realAStar, realBStar));
+				
+				/*System.out.println("Offset: " + tempExpOffset[i]);
+				System.out.println("Temp Avg Delta E: " + tempAvgDeltaE);
+				System.out.println("Avg Delta E:      " + avgDeltaE);
+				System.out.println("Difference: " + (avgDeltaE - tempAvgDeltaE));*/
+				
+				//If delta e got worse or stayed the same, try other direction
+				if((tempAvgDeltaE >= avgDeltaE) || (tempExpOffset[i] <= 0.01) || ((avgDeltaE - tempAvgDeltaE) <= 0.00000001)) {
+					expOffset[i] = tempExpOffset[i] - expStep;
+					l = false;
+					
+				}
+				//Otherwise continue process
+				else {
+					expOffset[i] = tempExpOffset[i];
+					avgDeltaE = tempAvgDeltaE;
+				}
+			}
+		}
+		return expOffset;
 	}
 		
 	public double[] convertDTod1D (Double[] arr) {

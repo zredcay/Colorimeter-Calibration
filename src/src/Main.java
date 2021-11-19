@@ -1,6 +1,7 @@
 package src;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -92,6 +93,20 @@ public class Main {
 		
 		System.out.println("Calibrating...");
 		for(int i = 0; i < cal.getNumRuns(); i++) {
+			System.out.println("Run " + i);
+			cal.setMultOffset(cal.adjustMultOffsets(cal.getAddOffset(), cal.getMultOffset(), 
+					cal.getExpOffset(), cal.getAvgDeltaE(), cal.getRawData(), cal.getMultStep(), 
+					cal.getSpecToXYZ(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
+			System.out.println("Mult Calibrated");
+			cal.setAddOffset(cal.adjustAddOffsets(cal.getAddOffset(), cal.getMultOffset(), 
+					cal.getExpOffset(), cal.getAvgDeltaE(), cal.getRawData(), cal.getMultStep(), 
+					cal.getSpecToXYZ(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
+			System.out.println("Add Calibrated");
+			cal.setExpOffset(cal.adjustExpOffsets(cal.getAddOffset(), cal.getMultOffset(), 
+					cal.getExpOffset(), cal.getAvgDeltaE(), cal.getRawData(), cal.getMultStep(), 
+					cal.getSpecToXYZ(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
+			System.out.println("Exp Calibrated");
+			
 			cal.setAltData(cal.applyOffsets(cal.getRawData(), cal.getAddOffset(), cal.getMultOffset(), cal.getExpOffset()));
 			
 			cal.setX(cal.calculateX(cal.getAltData(), cal.getSpecToXYZ()[0]));
@@ -489,13 +504,6 @@ public class Main {
 	
 	public CalibrationMethod initCal(CalibrationMethod cal) throws FileNotFoundException{
 		Scanner sc = new Scanner(System.in);
-		Double[] addOff = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		Double[] multOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-		Double[] expOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-		
-		cal.setAddOffset(addOff);
-		cal.setMultOffset(multOff);
-		cal.setExpOffset(expOff);
 		
 		File xyzToRGB = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\XYZToRGB.csv");
 		cal.setXYZToRGB(readCSV(xyzToRGB, 3, 3));
@@ -505,70 +513,123 @@ public class Main {
 		
 		readUserInput(cal);
 		
+		Double[] addOff = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		Double[] multOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+		Double[] expOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+		Double temp = 0.0;
+		for(int i = 0; i < cal.getRawData().length; i++) {
+			for(int j = 0; j < cal.getRawData()[0].length; j++) {
+				temp = 1 / cal.getRawData()[i][j];
+				if(multOff[j] > temp) {
+					multOff[j] = temp;
+				}
+			}
+		}
+		
+		cal.setAddOffset(addOff);
+		cal.setMultOffset(multOff);
+		cal.setExpOffset(expOff);
+		
+		cal.setAltData(cal.applyOffsets(cal.getRawData(), cal.getAddOffset(), cal.getMultOffset(), cal.getExpOffset()));
+		
+		cal.setX(cal.calculateX(cal.getAltData(), cal.getSpecToXYZ()[0]));
+		cal.setY(cal.calculateY(cal.getAltData(), cal.getSpecToXYZ()[1]));
+		cal.setZ(cal.calculateZ(cal.getAltData(), cal.getSpecToXYZ()[2]));
+		
+		cal.setVarX(cal.calculateVarX(cal.getX()));
+		cal.setVarY(cal.calculateVarY(cal.getY()));
+		cal.setVarZ(cal.calculateVarZ(cal.getZ()));
+		
+		cal.setCalLStar(cal.calculateLStar(cal.getVarY()));			
+		cal.setCalAStar(cal.calculateAStar(cal.getVarX(), cal.getVarY()));
+		cal.setCalBStar(cal.calculateBStar(cal.getVarY(), cal.getVarZ()));
+		
+		cal.setCalR(cal.calculateR(cal.getXYZToRGB(), cal.getX(), cal.getY(), cal.getZ()));			
+		cal.setCalG(cal.calculateG(cal.getXYZToRGB(), cal.getX(), cal.getY(), cal.getZ()));
+		cal.setCalB(cal.calculateB(cal.getXYZToRGB(), cal.getX(), cal.getY(), cal.getZ()));
+		
+		cal.setMaxRGB(cal.calculateMaxRGB(cal.getMaxRGB(), cal.getCalR(), cal.getCalG(), cal.getCalB()));			
+		
+		cal.setCalR(cal.scaleRGB(cal.getMaxRGB(), cal.getCalR()));			
+		cal.setCalG(cal.scaleRGB(cal.getMaxRGB(), cal.getCalG()));
+		cal.setCalB(cal.scaleRGB(cal.getMaxRGB(), cal.getCalB()));
+		
+		cal.setDeltaE(cal.calculateDeltaE(cal.getCalLStar(), cal.getCalAStar(), cal.getCalBStar(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
+		
+		cal.setAvgDeltaE(cal.averageDeltaE(cal.getDeltaE()));
+		
 		sc.close();
 		return cal;
 	}
 	
 	public void printResults(CalibrationMethod cal) {
 		System.out.println("Results:");
+		DecimalFormat dataDF = new DecimalFormat("####.##");
 		for(Double[] data : cal.getAltData()) {
 			System.out.println("A, B, C, D, E, F, H, I, J, R, S, T, U:");
 			for(Double val : data) {
-				System.out.print(val + " ");
+				System.out.print(dataDF.format(val) + " ");
 			}
 			System.out.println();
 		}
 		
 		System.out.println("Add:");
 		System.out.println("A, B, C, D, E, F, H, I, J, R, S, T, U:");
+		DecimalFormat addDF = new DecimalFormat("####.##");
 		for(Double val : cal.getAddOffset()) {
-			System.out.print(val + " ");
+			System.out.print(addDF.format(val) + " ");
 		}
 		System.out.println();
 		
 		System.out.println("Mult:");
 		System.out.println("A, B, C, D, E, F, H, I, J, R, S, T, U:");
+		DecimalFormat multDF = new DecimalFormat("####.####");
 		for(Double val : cal.getMultOffset()) {
-			System.out.print(val + " ");
+			System.out.print(multDF.format(val) + " ");
 		}
 		System.out.println();
 		
 		System.out.println("Exp:");
 		System.out.println("A, B, C, D, E, F, H, I, J, R, S, T, U:");
+		DecimalFormat expDF = new DecimalFormat("####.##");
 		for(Double val : cal.getExpOffset()) {
-			System.out.print(val + " ");
+			System.out.print(expDF.format(val) + " ");
 		}
 		System.out.println();
 		
 		System.out.println("XYZ:");
 		System.out.println("X, Y, Z:");
+		DecimalFormat xyzDF = new DecimalFormat("####.##");
 		for(int i = 0; i < cal.getX().length; i++) {
 			int num = i + 1;
-			System.out.println("	Sample " + num + ": " + cal.getX()[i] + ", " + cal.getY()[i] + ", " + cal.getZ()[i]);
+			System.out.println("	Sample " + num + ": " + xyzDF.format(cal.getX()[i]) + ", " + xyzDF.format(cal.getY()[i]) + ", " + xyzDF.format(cal.getZ()[i]));
 		}
 		
 		System.out.println("CIELAB:");
 		System.out.println("L, A, B:");
+		DecimalFormat labDF = new DecimalFormat("####.##");
 		for(int i = 0; i < cal.getCalLStar().length; i++) {
 			int num = i + 1;
-			System.out.println("	Sample " + num + ": " + cal.getCalLStar()[i] + ", " + cal.getCalAStar()[i] + ", " + cal.getCalBStar()[i] );
+			System.out.println("	Sample " + num + ": " + labDF.format(cal.getCalLStar()[i]) + ", " + labDF.format(cal.getCalAStar()[i]) + ", " + labDF.format(cal.getCalBStar()[i]));
 		}
 		
 		System.out.println("RGB:");
 		System.out.println("R, G, B:");
+		DecimalFormat rgbDF = new DecimalFormat("####.##");
 		for(int i = 0; i < cal.getCalR().length; i++) {
 			int num = i + 1;
-			System.out.println("	Sample " + num + ": " + cal.getCalR()[i] + ", " + cal.getCalG()[i] + ", " + cal.getCalB()[i] );
+			System.out.println("	Sample " + num + ": " + rgbDF.format(cal.getCalR()[i]) + ", " + rgbDF.format(cal.getCalG()[i]) + ", " + rgbDF.format(cal.getCalB()[i]));
 		}
 		
 		System.out.println("Delta E:");
+		DecimalFormat deDF = new DecimalFormat("####.##");
 		int count = 0;
 		for(Double val : cal.getDeltaE()) {
 			count++;
-			System.out.println("	Sample " + count + ": " + val);
+			System.out.println("	Sample " + count + ": " + deDF.format(val));
 		}
 		
-		System.out.println("Average Delta E: " + cal.getAvgDeltaE());
+		System.out.println("Average Delta E: " + deDF.format(cal.getAvgDeltaE()));
 	}
 	
 }

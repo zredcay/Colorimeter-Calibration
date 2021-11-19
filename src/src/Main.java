@@ -1,4 +1,6 @@
 package src;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
@@ -631,5 +633,5 @@ public class Main {
 		
 		System.out.println("Average Delta E: " + deDF.format(cal.getAvgDeltaE()));
 	}
-	
+		
 }

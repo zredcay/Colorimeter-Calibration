@@ -350,21 +350,21 @@ class MainTest {
 		main.setCal(main.initCal(main.getCal()));
 		
 		//Enter when prompted
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData.csv
-		//2
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
-		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\CalDemo.csv
+		//15
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
+		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\RealCIEL.csv
 		//3
 		//0.01
 		//0.0001
 		//0.01
 		
 		Double[] testAddOff = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		Double[] testMultOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+		Double[] testMultOff = {1.0/15, 1.0/16, 1.0/17, 1.0/18, 1.0/19, 1.0/20, 1.0/21, 1.0/22, 1.0/23, 1.0/24, 1.0/25, 1.0/26, 1.0/27, 1.0/28};
 		Double[] testExpOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 		
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getAddOffset()), calMeth.convertDTod1D(testAddOff), 0.01);
@@ -458,26 +458,28 @@ class MainTest {
 		main.printResults(main.getCal());
 		String expectedOutput = "Results:\r\n"
 				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
-				+ "1.0 \r\n"
+				+ "1 \r\n"
 				+ "Add:\r\n"
 				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
-				+ "1.0 \r\n"
+				+ "1 \r\n"
 				+ "Mult:\r\n"
 				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
-				+ "1.0 \r\n"
+				+ "1 \r\n"
 				+ "Exp:\r\n"
 				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"
-				+ "1.0 \r\n"
+				+ "1 \r\n"
+				+ "XYZ:\r\n"
+				+ "X, Y, Z:\r\n"
+				+ "	Sample 1: 1, 1, 1\r\n"
 				+ "CIELAB:\r\n"
 				+ "L, A, B:\r\n"
-				+ "	Sample 1: 1.0, 1.0, 1.0\r\n"
+				+ "	Sample 1: 1, 1, 1\r\n"
 				+ "RGB:\r\n"
 				+ "R, G, B:\r\n"
-				+ "	Sample 1: 1.0, 1.0, 1.0\r\n"
+				+ "	Sample 1: 1, 1, 1\r\n"
 				+ "Delta E:\r\n"
-				+ "	Sample 1: 1.0\r\n"
-				+ "Average Delta E: 1.0\r\n"
-				+ "";
+				+ "	Sample 1: 1\r\n"
+				+ "Average Delta E: 1\r\n";
 		assertEquals(expectedOutput, outContent.toString());
 	}
 	

@@ -8,6 +8,7 @@ public class CalibrationMethod {
 	private Double[] multOffset;
 	private Double[] expOffset;
 	private Double[] deltaE;
+	private Double[][] deltaRGB;
 	private Double avgDeltaE;
 	private Double[] maxRGB;
 	private Double[] calR;
@@ -37,7 +38,7 @@ public class CalibrationMethod {
 	
 	//Constructor
 	public CalibrationMethod(Double[][] rawData, Double[][] altData, Double[] addOffset,
-			Double[] multOffset, Double[] expOffset, Double[] deltaE, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB,
+			Double[] multOffset, Double[] expOffset, Double[] deltaE, Double[][] deltaRGB, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB,
 			Double[] realR, Double[] realG, Double[] realB, Double[] calLStar, Double[] calAStar, Double[] calBStar,
 			Double[] realLStar, Double[] realAStar, Double[] realBStar, Double[] x, Double[] y, Double[] z,
 			Double[] varX, Double[] varY, Double[] varZ, Double[][] xyzToRGB, Double[][] specToXYZ, int numRuns,
@@ -49,6 +50,7 @@ public class CalibrationMethod {
 		this.multOffset = multOffset;
 		this.expOffset = expOffset;
 		this.deltaE = deltaE;
+		this.deltaRGB = deltaRGB;
 		this.avgDeltaE = avgDeltaE;
 		this.maxRGB = maxRGB;
 		this.calR = calR;
@@ -95,6 +97,9 @@ public class CalibrationMethod {
 	}
 	public Double[] getDeltaE() {
 		return deltaE;
+	}
+	public Double[][] getDeltaRGB() {
+		return deltaRGB;
 	}
 	public Double getAvgDeltaE() {
 		return avgDeltaE;
@@ -193,6 +198,9 @@ public class CalibrationMethod {
 	}
 	public void setDeltaE(Double[] deltaE) {
 		this.deltaE = deltaE;
+	}
+	public void setDeltaRGB(Double[][] deltaRGB) {
+		this.deltaRGB = deltaRGB;
 	}
 	public void setAvgDeltaE(Double avgDeltaE) {
 		this.avgDeltaE = avgDeltaE;
@@ -468,6 +476,19 @@ public class CalibrationMethod {
 			}
 		}
 		return rgb;
+	}
+	
+	public Double[][] calculateDeltaRGB(Double[] calR, Double[] calG, Double[] calB,
+			Double[] realR, Double[] realG, Double[] realB){
+		Double[][] deltaRGB = new Double[calR.length][3];
+		
+		for(int i = 0; i < deltaRGB.length; i++) {
+			deltaRGB[i][0] = calR[i] - realR[i];
+			deltaRGB[i][1] = calG[i] - realG[i];
+			deltaRGB[i][2] = calB[i] - realB[i];
+		}
+		
+		return deltaRGB;
 	}
 	
 	public Double[] calculateDeltaE(Double[] calLStar, Double[] calAStar, Double[] calBStar,

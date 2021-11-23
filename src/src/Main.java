@@ -1,6 +1,4 @@
 package src;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
@@ -14,6 +12,7 @@ public class Main {
 	private Double[] multOffset;
 	private Double[] expOffset;
 	private Double[] deltaE;
+	private Double[][] deltaRGB;
 	private Double avgDeltaE;
 	private Double[] maxRGB;
 	private Double[] calR;
@@ -41,7 +40,7 @@ public class Main {
 	private Double multStep;
 	private Double expStep;
 	private CalibrationMethod cal = new CalibrationMethod(rawData, altData, addOffset, 
-			multOffset, expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
+			multOffset, expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
 			realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 			y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
 	public static void main(String[] args) throws FileNotFoundException {
@@ -51,6 +50,7 @@ public class Main {
 		Double[] multOffset = new Double[1];
 		Double[] expOffset = new Double[1];
 		Double[] deltaE = new Double[1];
+		Double[][] deltaRGB = new Double[1][1];
 		Double avgDeltaE = 0.0;
 		Double[] maxRGB = new Double[1];
 		Double[] calR = new Double[1];
@@ -78,11 +78,11 @@ public class Main {
 		Double multStep = 0.0;
 		Double expStep = 0.0;
 		CalibrationMethod cal = new CalibrationMethod(rawData, altData, addOffset, 
-				multOffset, expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
+				multOffset, expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, 
 				realB, calLStar, calAStar, calBStar, realLStar, realAStar, realBStar, x, 
 				y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns, addStep, multStep, expStep);
 		Main m = new Main(rawData, altData, addOffset, multOffset,
-				expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
+				expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 				addStep, multStep, expStep, cal);
@@ -133,6 +133,8 @@ public class Main {
 			cal.setCalG(cal.scaleRGB(cal.getMaxRGB(), cal.getCalG()));
 			cal.setCalB(cal.scaleRGB(cal.getMaxRGB(), cal.getCalB()));
 			
+			cal.setDeltaRGB(cal.calculateDeltaRGB(cal.getCalR(), cal.getCalG(), cal.getCalB(), cal.getRealR(), cal.getRealG(), cal.getRealB()));
+			
 			cal.setDeltaE(cal.calculateDeltaE(cal.getCalLStar(), cal.getCalAStar(), cal.getCalBStar(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
 			
 			cal.setAvgDeltaE(cal.averageDeltaE(cal.getDeltaE()));
@@ -146,7 +148,7 @@ public class Main {
 	}
 	
 	public Main(Double[][] rawData, Double[][] altData, Double[] addOffset, Double[] multOffset, Double[] expOffset,
-			Double[] deltaE, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB, Double[] realR,
+			Double[] deltaE, Double[][] deltaRGB, Double avgDeltaE, Double[] maxRGB, Double[] calR, Double[] calG, Double[] calB, Double[] realR,
 			Double[] realG, Double[] realB, Double[] calLStar, Double[] calAStar, Double[] calBStar, Double[] realLStar,
 			Double[] realAStar, Double[] realBStar, Double[] x, Double[] y, Double[] z, Double[] varX, Double[] varY,
 			Double[] varZ, Double[][] xyzToRGB, Double[][] specToXYZ, int numRuns, Double addStep, Double multStep,
@@ -158,6 +160,7 @@ public class Main {
 		this.multOffset = multOffset;
 		this.expOffset = expOffset;
 		this.deltaE = deltaE;
+		this.deltaRGB = deltaRGB;
 		this.avgDeltaE = avgDeltaE;
 		this.maxRGB = maxRGB;
 		this.calR = calR;
@@ -205,6 +208,9 @@ public class Main {
 	}
 	public Double[] getDeltaE() {
 		return deltaE;
+	}
+	public Double[][] getDeltaRGB() {
+		return deltaRGB;
 	}
 	public Double getAvgDeltaE() {
 		return avgDeltaE;
@@ -306,6 +312,9 @@ public class Main {
 	}
 	public void setDeltaE(Double[] deltaE) {
 		this.deltaE = deltaE;
+	}
+	public void setDeltaRGB(Double[][] deltaRGB) {
+		this.deltaRGB = deltaRGB;
 	}
 	public void setAvgDeltaE(Double avgDeltaE) {
 		this.avgDeltaE = avgDeltaE;
@@ -556,6 +565,8 @@ public class Main {
 		cal.setCalG(cal.scaleRGB(cal.getMaxRGB(), cal.getCalG()));
 		cal.setCalB(cal.scaleRGB(cal.getMaxRGB(), cal.getCalB()));
 		
+		cal.setDeltaRGB(cal.calculateDeltaRGB(cal.getCalR(), cal.getCalG(), cal.getCalB(), cal.getRealR(), cal.getRealG(), cal.getRealB()));
+		
 		cal.setDeltaE(cal.calculateDeltaE(cal.getCalLStar(), cal.getCalAStar(), cal.getCalBStar(), cal.getRealLStar(), cal.getRealAStar(), cal.getRealBStar()));
 		
 		cal.setAvgDeltaE(cal.averageDeltaE(cal.getDeltaE()));
@@ -621,6 +632,14 @@ public class Main {
 		for(int i = 0; i < cal.getCalR().length; i++) {
 			int num = i + 1;
 			System.out.println("	Sample " + num + ": " + rgbDF.format(cal.getCalR()[i]) + ", " + rgbDF.format(cal.getCalG()[i]) + ", " + rgbDF.format(cal.getCalB()[i]));
+		}
+		
+		System.out.println("Delta RGB:");
+		System.out.println("R, G, B:");
+		DecimalFormat deltaRGBDF = new DecimalFormat("####.##");
+		for(int i = 0; i < cal.getDeltaRGB().length; i++) {
+			int num = i + 1;
+			System.out.println("	Sample " + num + ": " + deltaRGBDF.format(cal.getDeltaRGB()[i][0]) + ", " + deltaRGBDF.format(cal.getDeltaRGB()[i][1]) + ", " + deltaRGBDF.format(cal.getDeltaRGB()[i][2]));
 		}
 		
 		System.out.println("Delta E:");

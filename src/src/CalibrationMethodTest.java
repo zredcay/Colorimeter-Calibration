@@ -15,6 +15,7 @@ class CalibrationMethodTest {
 	private Double[] multOffset;
 	private Double[] expOffset;
 	private Double[] deltaE;
+	private Double[][] deltaRGB;
 	private Double avgDeltaE;
 	private Double[] maxRGB;
 	private Double[] calR;
@@ -42,7 +43,7 @@ class CalibrationMethodTest {
 	private Double multStep;
 	private Double expStep;
 	private CalibrationMethod calMeth = new CalibrationMethod(rawData, altData, addOffset, multOffset,
-			expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, realB,
+			expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, realB,
 			calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 			x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 			addStep, multStep, expStep);
@@ -55,6 +56,7 @@ class CalibrationMethodTest {
 		multOffset = new Double[3];
 		expOffset = new Double[3];
 		deltaE = new Double[3];
+		deltaRGB = new Double[3][3];
 		avgDeltaE = 1.0;
 		maxRGB = new Double[3];
 		calR = new Double[3];
@@ -82,7 +84,7 @@ class CalibrationMethodTest {
 		multStep = 1.0;
 		expStep = 1.0;
 		calMeth = new CalibrationMethod(rawData, altData, addOffset, multOffset,
-				expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
+				expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 				addStep, multStep, expStep);
@@ -113,6 +115,10 @@ class CalibrationMethodTest {
 		Double[] testDeltaE = {0.0, 0.0, 0.0};
 		calMeth.setDeltaE(testDeltaE);
 		assertTrue(Arrays.deepEquals(calMeth.getDeltaE(), testDeltaE));
+		
+		Double[][] testDeltaRGB = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+		calMeth.setDeltaRGB(testDeltaRGB);
+		assertTrue(Arrays.deepEquals(calMeth.getDeltaRGB(), testDeltaRGB));
 		
 		Double testAvgDeltaE = 0.0; 
 		calMeth.setAvgDeltaE(testAvgDeltaE);
@@ -414,6 +420,23 @@ class CalibrationMethodTest {
 		
 		calMeth.setDeltaE(calMeth.calculateDeltaE(testCalLStar, testCalAStar, testCalBStar, testRealLStar, testRealAStar, testRealBStar));
 		assertArrayEquals(calMeth.convertDTod1D(calMeth.getDeltaE()), calMeth.convertDTod1D(testDeltaE), 0.01);
+	}
+	
+	@Test
+	void testCalDeltaRGB() {
+		Double[][] testDeltaRGB = {{10.0, 10.0, 10.0}, {0.0, 0.0, 0.0}, {-10.0, -10.0, -10.0}};
+		Double[] calR = {10.0, 0.0, -10.0};
+		Double[] calG = {10.0, 0.0, -10.0};
+		Double[] calB = {10.0, 0.0, -10.0};
+		Double[] realR = {0.0, 0.0, 0.0};
+		Double[] realG = {0.0, 0.0, 0.0};
+		Double[] realB = {0.0, 0.0, 0.0};
+		
+		calMeth.setDeltaRGB(calMeth.calculateDeltaRGB(calR, calG, calB, realR, realG, realB));
+		for(int i = 0; i < calMeth.getDeltaRGB().length; i++) {
+			assertArrayEquals(calMeth.convertDTod2D(testDeltaRGB)[i], calMeth.convertDTod2D(calMeth.getDeltaRGB())[i], 0.001);
+		}
+		
 	}
 	
 	@Test

@@ -23,6 +23,7 @@ class MainTest {
 	private Double[] multOffset;
 	private Double[] expOffset;
 	private Double[] deltaE;
+	private Double[][] deltaRGB;
 	private Double avgDeltaE;
 	private Double[] calR;
 	private Double[] calG;
@@ -50,12 +51,12 @@ class MainTest {
 	private Double multStep;
 	private Double expStep;
 	private CalibrationMethod calMeth = new CalibrationMethod(rawData, altData, addOffset, multOffset,
-			expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, realB,
+			expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calB, realR, realG, realB,
 			calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 			x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 			addStep, multStep, expStep);
 	private Main main = new Main(rawData, altData, addOffset, multOffset,
-			expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
+			expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 			calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 			x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 			addStep, multStep, expStep, calMeth);
@@ -74,6 +75,8 @@ class MainTest {
 		expOffset[0] = 1.0;
 		deltaE = new Double[1];
 		deltaE[0] = 1.0;
+		deltaRGB = new Double[1][1];
+		deltaRGB[0][0] = 1.0;
 		avgDeltaE = 1.0;
 		maxRGB = new Double[1];
 		maxRGB[0] = 1.0;
@@ -122,12 +125,12 @@ class MainTest {
 		multStep = 1.0;
 		expStep = 1.0;
 		calMeth = new CalibrationMethod(rawData, altData, addOffset, multOffset,
-				expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
+				expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 				addStep, multStep, expStep);
 		main = new Main(rawData, altData, addOffset, multOffset,
-				expOffset, deltaE, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
+				expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 				calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 				x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 				addStep, multStep, expStep, calMeth);
@@ -158,6 +161,10 @@ class MainTest {
 		Double[] testDeltaE = {0.0, 0.0, 0.0};
 		main.setDeltaE(testDeltaE);
 		assertTrue(Arrays.deepEquals(main.getDeltaE(), testDeltaE));
+		
+		Double[][] testDeltaRGB = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+		calMeth.setDeltaRGB(testDeltaRGB);
+		assertTrue(Arrays.deepEquals(calMeth.getDeltaRGB(), testDeltaRGB));
 		
 		Double testAvgDeltaE = 0.0; 
 		main.setAvgDeltaE(testAvgDeltaE);
@@ -394,6 +401,7 @@ class MainTest {
 		Double[] testMultOffset = {1.0};
 		Double[] testExpOffset = {1.0};
 		Double[] testDeltaE = {1.0};
+		Double[][] testDeltaRGB = {{1.0, 1.0, 1.0}};
 		Double testAvgDeltaE = 1.0;
 		Double[] testCalR = {1.0};
 		Double[] testCalG = {1.0};
@@ -448,6 +456,7 @@ class MainTest {
 		main.getCal().setCalG(testCalG);
 		main.getCal().setCalB(testCalB);
 		main.getCal().setDeltaE(testDeltaE);
+		main.getCal().setDeltaRGB(testDeltaRGB);
 		main.getCal().setAvgDeltaE(testAvgDeltaE);
 		main.getCal().setRawData(testRawData);
 		main.getCal().setAltData(testAltData);
@@ -477,9 +486,13 @@ class MainTest {
 				+ "RGB:\r\n"
 				+ "R, G, B:\r\n"
 				+ "	Sample 1: 1, 1, 1\r\n"
+				+ "Delta RGB:\r\n"
+				+ "R, G, B:\r\n"
+				+ "	Sample 1: 1, 1, 1\r\n"
 				+ "Delta E:\r\n"
 				+ "	Sample 1: 1\r\n"
-				+ "Average Delta E: 1\r\n";
+				+ "Average Delta E: 1\r\n"
+				+ "";
 		assertEquals(expectedOutput, outContent.toString());
 	}
 	

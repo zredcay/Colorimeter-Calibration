@@ -17,6 +17,7 @@ import org.junit.Before;
 //Test should be run individually as when run simultaneously certain tests will 
 //fail. They do pass when run one at a time. 
 class MainTest {
+	//create vars to perform testing
 	private Double[][] rawData;
 	private Double[][] altData;
 	private Double[] addOffset;
@@ -55,6 +56,8 @@ class MainTest {
 			calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
 			x, y, z, varX, varY, varZ, xyzToRGB, specToXYZ, numRuns,
 			addStep, multStep, expStep);
+	
+	//create a version of the main object
 	private Main main = new Main(rawData, altData, addOffset, multOffset,
 			expOffset, deltaE, deltaRGB, avgDeltaE, maxRGB, calR, calG, calR, realR, realG, realB,
 			calLStar, calAStar, calBStar, realLStar, realAStar, realBStar,
@@ -63,6 +66,7 @@ class MainTest {
 	
 	@Before
 	public void setUp() {
+		//create vars and initialize them for use in testing
 		rawData = new Double[1][1];
 		rawData[0][0] = 1.0;
 		altData = new Double[1][1];
@@ -138,6 +142,8 @@ class MainTest {
 
 	@Test
 	public void testGetAndSet() {
+		//test the getters and setters and assert the arrays are the same
+
 		Double [][] testRawData = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 		main.setRawData(testRawData);
 		assertTrue(Arrays.deepEquals(main.getRawData(), testRawData));
@@ -276,23 +282,40 @@ class MainTest {
 	
 	@Test
 	void readCSVTest() throws FileNotFoundException {
+		//throws exception if file can not be found
+		//testing methods for reading CSVs
+		
+		//2D
+		//create vars for testing purposes
 		Double[][] expected = {{1.0, 2.0}, {3.0, 4.0}}; 
 		File test = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\TestData.csv");
+		
+		//perform operations and assert arrays are equal
 		for(int i = 0; i < expected.length; i++) {
 			assertArrayEquals(calMeth.convertDTod1D(main.readCSV(test, 2, 2)[i]), calMeth.convertDTod1D(expected[i]), 0.01);
 		}
+		
+		//1D
+		//create vars for testing purposes
 		Double[] expected1 = {1.0, 2.0};
 		File test1 = new File("Z:\\PMFI Grant\\Grease Monkey\\Colorimeter Calibration\\src\\src\\TestData1.csv");
+		
+		//perform operations and assert arrays are equal
 		assertArrayEquals(calMeth.convertDTod1D(main.convertTo1D(main.readCSV(test1, 1, 2))), calMeth.convertDTod1D(expected1), 0.01);
 	}
 	
 	@Test
 	void getDataTest() {
+		//test sub methods for reading CSVs
+		
+		//create and initialize vars for testing purposes
 		ArrayList<String> expected = new ArrayList<String>(); 
 		expected.add("1.0");
 		expected.add("2.0");
 		
 		String test = "1.0,2.0";
+		
+		//perform operations and assert values are equal
 		for(int i = 0; i < expected.size(); i++) {
 			assertEquals(main.getDataFromLine(test).get(i), expected.get(i));
 		}
@@ -300,17 +323,25 @@ class MainTest {
 	
 	@Test
 	void convertTo1DTest() {
+		//test methods for converting arrays
+		
+		//create and initialize vars for testing purposes
 		Double[][] test = {{1.0, 2.0, 3.0}};
 		Double[] expected = {1.0, 2.0, 3.0};
 		
+		//perform operations and assert arrays are equal
 		assertArrayEquals(calMeth.convertDTod1D(main.convertTo1D(test)), calMeth.convertDTod1D(expected),  0.001);
 	}
 	
 	@Test
 	void readUserInputTest() throws FileNotFoundException {
+		//throws exceptions if the file can not be found
+		//testing methods involving user input
+		
+		//perform operation
 		main.setCal(main.readUserInput(main.getCal()));
 		
-		//Enter when prompted
+		//Test requires user input, as such enter the following when prompted
 		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData.csv
 		//2
 		//Z:\PMFI Grant\Grease Monkey\Colorimeter Calibration\src\src\TestData1.csv
@@ -324,13 +355,18 @@ class MainTest {
 		//0.0001
 		//0.01
 		
+		//create var for testing purposes, 2D
 		Double[][] testRawData = {{1.0, 2.0}, {3.0, 4.0}};
+		
+		//assert arrays are equal for the raw data var
 		for(int i = 0; i < testRawData.length; i++) {
 			assertArrayEquals(calMeth.convertDTod1D(main.getCal().getRawData()[i]), calMeth.convertDTod1D(testRawData[i]), 0.001);
 		}
 		
+		//create var for testing purposes, 1D
 		Double[] testSingleArr = {1.0, 2.0};
 		
+		//assert arrays are equal
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getRealLStar()), calMeth.convertDTod1D(testSingleArr), 0.001);
 		
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getRealAStar()), calMeth.convertDTod1D(testSingleArr), 0.001);
@@ -354,6 +390,10 @@ class MainTest {
 	
 	@Test
 	void initCalTest() throws FileNotFoundException {
+		//throws exception if the file can not be found
+		//testing the initialize method
+		
+		//perform operation
 		main.setCal(main.initCal(main.getCal()));
 		
 		//Enter when prompted
@@ -370,24 +410,30 @@ class MainTest {
 		//0.0001
 		//0.01
 		
+		//create vars for testing purposes
 		Double[] testAddOff = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		Double[] testMultOff = {1.0/15, 1.0/16, 1.0/17, 1.0/18, 1.0/19, 1.0/20, 1.0/21, 1.0/22, 1.0/23, 1.0/24, 1.0/25, 1.0/26, 1.0/27, 1.0/28};
 		Double[] testExpOff = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 		
+		//assert arrays are equal
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getAddOffset()), calMeth.convertDTod1D(testAddOff), 0.01);
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getMultOffset()), calMeth.convertDTod1D(testMultOff), 0.01);
 		assertArrayEquals(calMeth.convertDTod1D(main.getCal().getExpOffset()), calMeth.convertDTod1D(testExpOff), 0.01);
 		
+		//create var for testing purposes
 		Double[][] testXYZToRGB = {{3.2404542,-1.5371385,-0.4985314}, {-0.969266,1.8760108,0.041556}, {0.0556434,-0.2040259,1.0572252}};
 		
+		//assert arrays are equal
 		for(int i = 0; i < testXYZToRGB.length; i++) {
 			assertArrayEquals(calMeth.convertDTod1D(main.getCal().getXYZToRGB()[i]), calMeth.convertDTod1D(testXYZToRGB[i]), 0.001);
 		}
 		
+		//creating var for testing purposes
 		Double[][] testSpecToXYZ = {{0.08277331,0.3693084,0.3013112,0.0383677,0.03778185,0.3046991,0.7123849,1.106886,0.3496358,0.006809147,1.048485,0.04221473,0.001061495,0.000128739}, 
 				{0.01041303,0.06047429,0.1414586,0.3109438,0.6248296,0.9233858,0.9944304,0.8370838,0.1410203,0.002619372,0.5282296,0.01628841,0.000409893,5.01893E-05}, 
 				{0.3832822,1.867751,1.76844,0.5549619,0.08852389,0.009753,0.000877926,8.18395E-05,0.0,0.0,9.53013E-06,0.0,0.0,0.0}};
 		
+		//assert arrays are equal
 		for(int i = 0; i < testSpecToXYZ.length; i++) {
 			assertArrayEquals(calMeth.convertDTod1D(main.getCal().getSpecToXYZ()[i]), calMeth.convertDTod1D(testSpecToXYZ[i]), 0.001);
 		}
@@ -395,6 +441,9 @@ class MainTest {
 	
 	@Test
 	void printResultsTest() {
+		//testing the print results method
+		
+		//create and initialize vars for testing purposes
 		Double[][] testRawData = {{1.0}};
 		Double[][] testAltData = {{1.0}};
 		Double[] testAddOffset = {1.0};
@@ -428,6 +477,7 @@ class MainTest {
 		Double testMultStep = 1.0;
 		Double testExpStep = 1.0;
 		
+		//set vars in the main object
 		main.getCal().setAddOffset(testAddOffset);
 		main.getCal().setMultOffset(testMultOffset);
 		main.getCal().setExpOffset(testExpOffset);
@@ -461,9 +511,11 @@ class MainTest {
 		main.getCal().setRawData(testRawData);
 		main.getCal().setAltData(testAltData);
 		
+		//collect the data from the console for assertion
 		ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 	    System.setOut(new PrintStream(outContent));
 
+	    //perform operations and assert it is equal
 		main.printResults(main.getCal());
 		String expectedOutput = "Results:\r\n"
 				+ "A, B, C, D, E, F, H, I, J, R, S, T, U:\r\n"

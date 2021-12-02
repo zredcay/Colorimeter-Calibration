@@ -281,7 +281,7 @@ class MainTest {
 	}
 	
 	@Test
-	void readCSVTest() throws FileNotFoundException {
+	void testReadCSV() throws FileNotFoundException {
 		//throws exception if file can not be found
 		//testing methods for reading CSVs
 		
@@ -305,7 +305,7 @@ class MainTest {
 	}
 	
 	@Test
-	void getDataTest() {
+	void testGetData() {
 		//test sub methods for reading CSVs
 		
 		//create and initialize vars for testing purposes
@@ -322,7 +322,7 @@ class MainTest {
 	}
 	
 	@Test
-	void convertTo1DTest() {
+	void testConvertTo1D() {
 		//test methods for converting arrays
 		
 		//create and initialize vars for testing purposes
@@ -334,7 +334,7 @@ class MainTest {
 	}
 	
 	@Test
-	void readUserInputTest() throws FileNotFoundException {
+	void testReadUserInput() throws FileNotFoundException {
 		//throws exceptions if the file can not be found
 		//testing methods involving user input
 		
@@ -389,7 +389,7 @@ class MainTest {
 	}
 	
 	@Test
-	void initCalTest() throws FileNotFoundException {
+	void testInitCal() throws FileNotFoundException {
 		//throws exception if the file can not be found
 		//testing the initialize method
 		
@@ -440,7 +440,7 @@ class MainTest {
 	}
 	
 	@Test
-	void printResultsTest() {
+	void testPrintResults() {
 		//testing the print results method
 		
 		//create and initialize vars for testing purposes

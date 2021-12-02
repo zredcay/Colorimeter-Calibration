@@ -667,7 +667,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through positive loop
 		for(int i = addOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean k = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
@@ -718,7 +717,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through negative loop
 		for(int i = addOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean l = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
@@ -785,7 +783,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through positive loop
 		for(int i = multOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean k = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
@@ -836,7 +833,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through negative loop
 		for(int i = multOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean l = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
@@ -903,7 +899,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through positive loop
 		for(int i = expOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean k = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
@@ -954,7 +949,6 @@ public class CalibrationMethod {
 		//for every offset value, iterate through negative loop
 		for(int i = expOffset.length - 1; i > 0; i--) {
 			//print the offset number to check progress
-			System.out.println("Offset " + i);
 			Boolean l = true;
 			
 			//while the iteration improves the delta e continue, stop when it gets worse or the change is too small
